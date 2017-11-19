@@ -9,9 +9,9 @@
  * function.
  */
 
-/*#define trigPin 2
+#define trigPin 2
 #define echoPin 3
-*/
+
 ZumoMotors motors;
 
 int speed = 200;
