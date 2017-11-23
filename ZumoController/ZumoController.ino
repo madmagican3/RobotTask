@@ -9,12 +9,12 @@
  * function.
  */
 
-#define trigPin 2
+#define trigPin 4
 #define echoPin 3
 
 ZumoMotors motors;
 
-int speed = 200;
+int speed = 100;
 
 void setup()
 {
@@ -30,17 +30,18 @@ void w (){
 }
 void a(){
   //run the following motor foward
-  motors.setLeftSpeed(-speed*2);
+  motors.setLeftSpeed((speed*2)*-1);
   motors.setRightSpeed(speed*2);
 }
 void d(){
   motors.setLeftSpeed(speed*2);
-  motors.setRightSpeed(-speed*2);
+  motors.setRightSpeed((speed*2)*-1);
 }
 void avoidObstacle(){
-motors.setLeftSpeed(speed*2);
+ Serial.write("avoiding");
+ motors.setLeftSpeed(speed*2);
   motors.setRightSpeed(-speed*2);
-  delay (2000);
+  delay (1000);
   motors.setLeftSpeed(0);
   motors.setRightSpeed(0);
   }
@@ -70,18 +71,20 @@ void stop(){
 }
 bool checkObstacle(){
   long duration, distance;
-  digitalWrite(trigPin, LOW);  // Added this line
-  delayMicroseconds(2); // Added this line
+  digitalWrite(trigPin, LOW);  
+  delayMicroseconds(2);
   digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10); // Added this line
+  delayMicroseconds(10); 
   digitalWrite(trigPin, LOW);
   duration = pulseIn(echoPin, HIGH);
   distance = (duration/2) / 29.1;
-  if (distance<4){
+  Serial.println(distance);
+  if (distance<10){
     return false;
   }
   return true;
 }
+
 
 void loop()
 {
@@ -114,6 +117,6 @@ void loop()
     avoidObstacle();
   }
 
-  delay(100);
+  delay(150);
   
 }
