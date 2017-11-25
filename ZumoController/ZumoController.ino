@@ -15,6 +15,10 @@
 ZumoMotors motors;
 
 int speed = 100;
+boolean override = false; // This should be false until you want to override it to control the system manually
+boolean started = true;//this should be true until the program needs to auto solve the map
+boolean pause = false; //this is used to turn the corners
+boolean returning = false; //This is used to indicate if the system should return
 
 void setup()
 {
@@ -23,53 +27,32 @@ void setup()
   Serial.begin(9600);
 }
 
-void w (){
-  //This sets the motor to run foward
+void w (){//foward
   motors.setLeftSpeed (speed);
   motors.setRightSpeed(speed);
 }
-void a(){
-  //run the following motor foward
+
+void a(){//left
   motors.setLeftSpeed((speed*2)*-1);
   motors.setRightSpeed(speed*2);
 }
-void d(){
+
+void d(){//right
   motors.setLeftSpeed(speed*2);
   motors.setRightSpeed((speed*2)*-1);
 }
-void avoidObstacle(){
- Serial.write("avoiding");
- motors.setLeftSpeed(speed*2);
-  motors.setRightSpeed(-speed*2);
-  delay (1000);
-  motors.setLeftSpeed(0);
-  motors.setRightSpeed(0);
-  }
-void s(){
+  
+void s(){//backwards
   motors.setLeftSpeed(-speed);
   motors.setRightSpeed(-speed);
 }
-void y(){
-   motors.setLeftSpeed (speed- (speed *0.75));
-  motors.setRightSpeed(speed); 
-}
-void u(){
-    motors.setLeftSpeed (speed);
-  motors.setRightSpeed(speed - (speed *0.75));
-}
-void h(){
-    motors.setLeftSpeed (-speed - (speed *0.75));
-  motors.setRightSpeed(-speed);
-}
-void j(){
-    motors.setLeftSpeed (-speed);
-  motors.setRightSpeed(-speed - (speed * 0.75));
-}
+
 void stop(){
   motors.setLeftSpeed(0);
   motors.setRightSpeed(0);
 }
-bool checkObstacle(){
+
+bool checkObstacle(){// returns true if there's an obstacle within 10cm's
   long duration, distance;
   digitalWrite(trigPin, LOW);  
   delayMicroseconds(2);
@@ -85,13 +68,19 @@ bool checkObstacle(){
   return true;
 }
 
-
 void loop()
 {
    char val = Serial.read();
-   if (checkObstacle()){
-   
-      switch (val){
+   if (returning){// if we're returning
+    
+   }
+   if (started){//if we're on the starting point
+    if (val == 'p'){
+      started = false;
+    }
+   }
+   if (override){//if we've overidden the default system to control the robot manually
+     switch (val){
       case 'd': d();
       break;
       case 's': s();
@@ -100,23 +89,26 @@ void loop()
       break;
       case 'w':w();
       break;
-      case 'y':y();
-      break;
-      case 'u':u();
-      break;
-      case 'h':h();
-      break;
-      case 'j':j();
-      break;
       case 'z':stop();
       break;
       default:
-      break;
-      
-  }}else{
-    avoidObstacle();
-  }
+      break; 
+   } 
+   }
 
+
+   if (pause){// if we're pausing to get it to check a corridor or a door
+     if (val == 'd'){//right
+       
+     }else if (val == 'a'){//left
+      
+     }
+   }
+   if (val == 'l'){// if the value is l we want to start the pause
+    pause = true;
+   }
+   
+   
   delay(150);
   
 }
