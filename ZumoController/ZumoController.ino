@@ -1,20 +1,19 @@
 #include <ZumoMotors.h>
-
-/*
- * This example uses the ZumoMotors library to drive each motor on the Zumo
- * forward, then backward. The yellow user LED is on when a motor should be
- * running forward and off when a motor should be running backward. If a
- * motor on your Zumo has been flipped, you can correct its direction by
- * uncommenting the call to flipLeftMotor() or flipRightMotor() in the setup()
- * function.
- */
+#include <ZumoReflectanceSensorArray.h>
+#include <Pushbutton.h>
+#include <QTRSensors.h>
 
 #define trigPin 4
 #define echoPin 3
+#define ledPin 13
 
+Pushbutton button(ZUMO_BUTTON);
 ZumoMotors motors;
+ZumoReflectanceSensorArray reflectanceSensors;
 
+int sensorArr[6];
 int speed = 100;
+int threshold = 10000;//this is the colour threshold for the sensors
 boolean override = false; // This should be false until you want to override it to control the system manually
 boolean started = true;//this should be true until the program needs to auto solve the map
 boolean pause = false; //this is used to turn the corners
@@ -22,9 +21,88 @@ boolean returning = false; //This is used to indicate if the system should retur
 
 void setup()
 {
+  Serial.begin(9600);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
-  Serial.begin(9600);
+  calibrate();
+}
+
+void loop()
+{
+   char val = Serial.read();
+   if (returning){// if we're returning
+    
+   }
+   if (started){//if we're on the starting point
+    if (val == 'p'){
+      started = false;
+      stop();
+      return;
+    }
+    start();
+   }
+   if (override){//if we've overidden the default system to control the robot manually
+     switch (val){
+      case 'd': d();
+      break;
+      case 's': s();
+      break;
+      case 'a':a();
+      break;
+      case 'w':w();
+      break;
+      case 'z':stop();
+      break;
+      default:
+      break; 
+   } 
+   }
+
+
+   if (pause){// if we're pausing to get it to check a corridor or a door
+     if (val == 'd'){//right
+       
+     }else if (val == 'a'){//left
+      
+     }
+   }
+   if (val == 'l'){// if the value is l we want to start the pause
+    pause = true;
+   }
+   
+   
+  delay(150);
+  
+}
+
+void calibrate(){
+    reflectanceSensors.init();
+    reflectanceSensors.calibrate();
+    Serial.println("Please place the zumo in the correct location then press the button to initiate the search and rescue operation");
+    button.waitForButton();
+}
+
+void start(){
+  reflectanceSensors.readCalibrated(sensorArr);
+      for (byte i = 0; i < 6; i++){
+        Serial.println(sensorArr[i]);
+      }
+      delay( 1000);
+  return;
+    for (byte i = 0; i < 6; i++)
+      {
+        reflectanceSensors.readLine(sensorArr);
+        Serial.println(sensorArr[i]);
+        if (sensorArr[i] > threshold)
+        {
+          stop();
+          Serial.println("Wall detected");
+          returning = true;
+          started = false;
+          return;
+        }
+      }
+     w();
 }
 
 void w (){//foward
@@ -68,47 +146,4 @@ bool checkObstacle(){// returns true if there's an obstacle within 10cm's
   return true;
 }
 
-void loop()
-{
-   char val = Serial.read();
-   if (returning){// if we're returning
-    
-   }
-   if (started){//if we're on the starting point
-    if (val == 'p'){
-      started = false;
-    }
-   }
-   if (override){//if we've overidden the default system to control the robot manually
-     switch (val){
-      case 'd': d();
-      break;
-      case 's': s();
-      break;
-      case 'a':a();
-      break;
-      case 'w':w();
-      break;
-      case 'z':stop();
-      break;
-      default:
-      break; 
-   } 
-   }
 
-
-   if (pause){// if we're pausing to get it to check a corridor or a door
-     if (val == 'd'){//right
-       
-     }else if (val == 'a'){//left
-      
-     }
-   }
-   if (val == 'l'){// if the value is l we want to start the pause
-    pause = true;
-   }
-   
-   
-  delay(150);
-  
-}
