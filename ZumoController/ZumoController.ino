@@ -77,8 +77,18 @@ void loop()
 
 void calibrate(){
     reflectanceSensors.init();
-    reflectanceSensors.calibrate();
     Serial.println("Please place the zumo in the correct location then press the button to initiate the search and rescue operation");
+    reflectanceSensors.calibrate();
+    for (int i = 1; i <= 6; i++){
+      if (i % 2 == 0){
+        motors.setLeftSpeed(-400);
+        motors.setLeftSpeed(-400);
+      }else{
+        motors.setLeftSpeed(400);
+        motors.setLeftSpeed(400);
+      }
+      delay (200);
+    }
     button.waitForButton();
 }
 
