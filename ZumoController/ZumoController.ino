@@ -11,94 +11,135 @@ Pushbutton button(ZUMO_BUTTON);
 ZumoMotors motors;
 ZumoReflectanceSensorArray reflectanceSensors;
 
-int sensorArr[6];
-int speed = 100;
+int sensorArr[6];//This defines the sensor array
+int speed = 100;//This is the speed the robot should run at 
 int threshold = 10000;//this is the colour threshold for the sensors
-boolean override = false; // This should be false until you want to override it to control the system manually
-boolean started = true;//this should be true until the program needs to auto solve the map
+boolean overrideAutoRun = false; // This should be false until you want to override it to control the system manually
+boolean runningMaze = true;//this should be true until the program needs to auto solve the map
 boolean pause = false; //this is used to turn the corners
 boolean returning = false; //This is used to indicate if the system should return
+char path[100];//This array is used as a list in order to work out the turns the arduino is taking
+int pathLength =0;//This is used to keep track of the actual length of the array above
 
 void setup()
 {
+  delay (3000);
+  turnRight();
+  delay(10000);
+  turnLeft();
+  return;
   Serial.begin(9600);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+  //define the pins and then calibrate the program
   calibrate();
 }
 
 void loop()
 {
+  return;
    char val = Serial.read();
+   checkChar(val);
+
    if (returning){// if we're returning
     
    }
-   if (started){//if we're on the starting point
-    if (val == 'p'){
-      started = false;
-      stop();
-      return;
-    }
-    start();
-   }
-   if (override){//if we've overidden the default system to control the robot manually
+   
+   if (overrideAutoRun){//if we've overidden the default system to control the robot manually
      switch (val){
       case 'd': d();
-      break;
+        break;
       case 's': s();
-      break;
+        break;
       case 'a':a();
-      break;
+        break;
       case 'w':w();
-      break;
+       break;
       case 'z':stop();
-      break;
+        break;
       default:
-      break; 
-   } 
+        break; 
+    } 
    }
-
-
+   
+   if (runningMaze){
+    
+   }
+   
    if (pause){// if we're pausing to get it to check a corridor or a door
+    Serial.println("Please press the button to indicate the next direction");
      if (val == 'd'){//right
-       
+       path[pathLength] = 'd';
+       pathLength += 1;
+       serial.println("Turning right");      
+       turnRight();
+       checkChar('n');
      }else if (val == 'a'){//left
-      
+       path[pathLength] = 'a';
+       pathLength += 1;
+       Serial.println("Turning left");
+       turnLeft();
+       checkChar('n')
      }
    }
-   if (val == 'l'){// if the value is l we want to start the pause
-    pause = true;
+   
+    delay(150);
+}
+
+//This should check the char input and then modify the booleans to control the flow if appropriate
+void checkChar(char val){
+   if (val == 'p'){// if the value is p we want to start the pause
+      stop();
+      pause = true;
+      returning = false;
+      runningMaze = false;
+      overrideAutoRun = false;
+   } else if (val = 'o'){//If the value is o we want to start the overide
+      overrideAutoRun = true;
+      returning = false;
+      runningMaze = false;
+      pause = false;
+   }else if (val = 'n'){//if the value is n we want to return to doing the run
+      runningMaze = true;
+      returning = false;
+      pause = false;
+      overrideAutoRun = false;
+   }else if (val = ';'){// if the value is ; we want to start returning 
+      runningMaze = false;
+      returning = true;
+      pause = false;
+      overrideAutoRun = false;
    }
-   
-   
-  delay(150);
-  
 }
 
+//This will calibrate the sensors by asking the user to place it facing the black line then putting it in the normal spot
 void calibrate(){
+  //inform the user that we want to start calibrating then wait for button
     reflectanceSensors.init();
-    Serial.println("Please place the zumo in the correct location then press the button to initiate the search and rescue operation");
-    reflectanceSensors.calibrate();
-    for (int i = 1; i <= 6; i++){
-      if (i % 2 == 0){
-        motors.setLeftSpeed(-400);
-        motors.setLeftSpeed(-400);
-      }else{
-        motors.setLeftSpeed(400);
-        motors.setLeftSpeed(400);
-      }
-      delay (200);
-    }
+    digitalWrite(ledPin, HIGH);
+    Serial.println("Please place the zumo facing a black line in order to allow for calibration");
     button.waitForButton();
+    //Calibrate the sensors
+    for (int i = 1; i < 7; i++){
+      delay (1500);      
+      reflectanceSensors.calibrate();
+      if (i % 2 == 0){
+        motors.setLeftSpeed(-50);
+        motors.setRightSpeed(-50);
+      }else{
+        motors.setLeftSpeed(50);
+        motors.setRightSpeed(50);
+      }      
+    } 
+    stop();
+    digitalWrite(ledPin, LOW);
+    Serial.println("Please place the zumo in the correct starting position");
+    button.waitForButton();
+    //Stop and wait to be put into the ready position
 }
 
-void start(){
+void runMaze(){
   reflectanceSensors.readCalibrated(sensorArr);
-      for (byte i = 0; i < 6; i++){
-        Serial.println(sensorArr[i]);
-      }
-      delay( 1000);
-  return;
     for (byte i = 0; i < 6; i++)
       {
         reflectanceSensors.readLine(sensorArr);
@@ -107,13 +148,13 @@ void start(){
         {
           stop();
           Serial.println("Wall detected");
-          returning = true;
-          started = false;
+          checkChar('p');
           return;
         }
       }
      w();
 }
+
 
 void w (){//foward
   motors.setLeftSpeed (speed);
@@ -140,7 +181,20 @@ void stop(){
   motors.setRightSpeed(0);
 }
 
-bool checkObstacle(){// returns true if there's an obstacle within 10cm's
+void turnRight(){//This should be a 90 degree turn (or as close as possible) for simplicities sake towards the right
+  motors.setLeftSpeed(-200);
+  motors.setRightSpeed(200);
+  delay(400);
+  stop();
+}
+void turnLeft(){//This should be a 90 degree turn (or as close as possible) for simplicities sake towards the left
+  motors.setLeftSpeed(200);
+  motors.setRightSpeed(-200);
+  delay(400);
+  stop();
+}
+
+bool checkItem(){// returns true if there's an item within 10cm's
   long duration, distance;
   digitalWrite(trigPin, LOW);  
   delayMicroseconds(2);
