@@ -23,12 +23,8 @@ int pathLength =0;//This is used to keep track of the actual length of the array
 
 void setup()
 {
-  delay (3000);
-  turnRight();
-  delay(10000);
-  turnLeft();
-  return;
   Serial.begin(9600);
+  connectToProgram();
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   //define the pins and then calibrate the program
@@ -84,6 +80,18 @@ void loop()
    }
    
     delay(150);
+}
+
+void connectToProgram(){
+  bool notConnected = true;
+  while (notConnected){
+      char val = Serial.read();
+      if (val = 'c'){
+        Serial.println('d');
+        return;
+      }
+      delay(50);
+  }
 }
 
 //This should check the char input and then modify the booleans to control the flow if appropriate
