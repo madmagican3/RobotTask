@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ArduinoSetup
@@ -27,7 +28,7 @@ namespace ArduinoSetup
             this.form = form;
         }
         /// <summary>
-        /// This is used to send chars to the arduion
+        /// This is used to send chars to the arduino
         /// </summary>
         public void SendChar(char val)
         {
@@ -40,7 +41,8 @@ namespace ArduinoSetup
         {
             while (true)
             {
-                var s = port.ReadLine();
+                Thread.Sleep(1000);
+                var s = port.ReadExisting();
                 if (s != "")
                 {
                     form.SetText(s);

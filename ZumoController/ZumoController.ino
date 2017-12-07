@@ -13,7 +13,7 @@ ZumoReflectanceSensorArray reflectanceSensors;
 
 int sensorArr[6];//This defines the sensor array
 int speed = 100;//This is the speed the robot should run at 
-int threshold = 10000;//this is the colour threshold for the sensors
+int threshold = 500;//this is the colour threshold for the sensors
 boolean overrideAutoRun = false; // This should be false until you want to override it to control the system manually
 boolean runningMaze = true;//this should be true until the program needs to auto solve the map
 boolean pause = false; //this is used to turn the corners
@@ -35,10 +35,8 @@ void setup()
 
 void loop()
 {
-  return;
    char val = Serial.read();
    checkChar(val);
-
    if (returning){// if we're returning
     
    }
@@ -61,11 +59,10 @@ void loop()
    }
    
    if (runningMaze){
-    
+    runMaze();
    }
    
    if (pause){// if we're pausing to get it to check a corridor or a door
-    Serial.println("Please press the button to indicate the next direction");
      if (val == 'd'){//right
        path[pathLength] = 'd';
        pathLength += 1;
@@ -101,21 +98,22 @@ void connectToProgram(){
 void checkChar(char val){
    if (val == 'p'){// if the value is p we want to start the pause
       stop();
+      Serial.println("|h|");//pass a non human readable string to be transformed in the program
       pause = true;
       returning = false;
       runningMaze = false;
       overrideAutoRun = false;
-   } else if (val = 'o'){//If the value is o we want to start the overide
+   } else if (val == 'o'){//If the value is o we want to start the overide
       overrideAutoRun = true;
       returning = false;
       runningMaze = false;
       pause = false;
-   }else if (val = 'n'){//if the value is n we want to return to doing the run
+   }else if (val == 'n'){//if the value is n we want to return to doing the run
       runningMaze = true;
       returning = false;
       pause = false;
       overrideAutoRun = false;
-   }else if (val = ';'){// if the value is ; we want to start returning 
+   }else if (val == ';'){// if the value is ; we want to start returning 
       runningMaze = false;
       returning = true;
       pause = false;
@@ -126,9 +124,11 @@ void checkChar(char val){
 //This will calibrate the sensors by asking the user to place it facing the black line then putting it in the normal spot
 void calibrate(){
   //inform the user that we want to start calibrating then wait for button
+  delay(100);
     reflectanceSensors.init();
     digitalWrite(ledPin, HIGH);
-    Serial.println("Please place the zumo facing a black line in order to allow for calibration"); 
+    Serial.println("Please place the zumo facing a black line in order to allow for calibration|"); 
+    Serial.println("Then please press the button on the zumo once that is done");
     button.waitForButton();
     //Calibrate the sensors
     for (int i = 1; i < 7; i++){
@@ -144,8 +144,10 @@ void calibrate(){
     } 
     stop();
     digitalWrite(ledPin, LOW);
-    Serial.println("Please place the zumo in the correct starting position");
+    Serial.println("Please place the zumo in the correct starting position|");
+    Serial.println("Press the button when ready to start");
     button.waitForButton();
+    runningMaze = true;
     //Stop and wait to be put into the ready position
 }
 
@@ -155,11 +157,12 @@ void runMaze(){
     for (byte i = 0; i < 6; i++)
       {
         reflectanceSensors.readLine(sensorArr);
-        Serial.println(sensorArr[i]);
         if (sensorArr[i] > threshold)//if we've encountered a wall
         {
-          Serial.println("Wall detected in corridor " + pathLength+1);//as specified in the spec, we tell them the corridor no, which is pathlength +1 (as we dont start on the 0th indice
+          Serial.println("w|");//as specified in the spec, we tell them the corridor no, which is pathlength +1 (as we dont start on the 0th indice
           //for human counting
+          Serial.println(pathLength);
+          delay(200);
           checkChar('p');//This will pause the run
           return;
         }

@@ -73,7 +73,7 @@ namespace ArduinoSetup
                 currentPort.Write("c");
                 Thread.Sleep(1000);
 
-                var returnStr = currentPort.ReadLine();
+                var returnStr = currentPort.ReadExisting();
                 currentPort.Close();
                 if (returnStr != "")
                 {
@@ -95,6 +95,7 @@ namespace ArduinoSetup
         {
             Thread thread = new Thread(new ThreadStart(_localSerialInstance.ReadChar));
             thread.Start();
+            ChooseDirection(false);
         }
         /// <summary>
         /// This is used to update the list box from the serial handler class
@@ -111,6 +112,11 @@ namespace ArduinoSetup
             {
                 if (!IdentifyChar(text))//if we cant identify the character
                 {
+                    if (text.Contains("|"))// if it's got a pipe we've got to split the string
+                    {
+                        DelimitString(text);
+                        return;
+                    }
                     this.SerialReturnsList.Items.Add(text);
                 }
             }
@@ -128,7 +134,7 @@ namespace ArduinoSetup
             }
             var charArray = localString.ToCharArray();
             // if we've encountered a wall
-            if (charArray[0] == 'w') // TODO make wall interaction here
+            if (charArray[0] == 'w' && charArray.Length == 1) 
             {
                 this.SerialReturnsList.Items.Add("We've encountered a wall");
                 gettingWallNumber = true;
@@ -139,11 +145,93 @@ namespace ArduinoSetup
                 this.SerialReturnsList.Items.Add("At corridor no " + tempNo);
                 gettingWallNumber = false;
                 return true;
+            }else if (charArray[0] == 'h' && charArray.Length == 1)
+            { 
+                this.SerialReturnsList.Items.Add("Paused, please select a direction");
+                ChooseDirection(true);
+                return true;
             }
             else
             {
                 return false;
             }
+        }
+        /// <summary>
+        /// This enabled or disables the buttons for choosing direction depending on the bool passed
+        /// </summary>
+        /// <param name="activate"></param>
+        public void ChooseDirection(bool activate)
+        {
+            RightBtn.Visible = activate;
+            LeftBtn.Visible = activate;
+            PauseBtn.Visible = !activate;
+        }
+        /// <summary>
+        /// This is used to indicate our direction 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RightBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('d');
+            ChooseDirection(false);
+        }
+        /// <summary>
+        /// This is used to indicate our direction
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LeftBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('a');
+            ChooseDirection(false);
+        }
+        /// <summary>
+        /// This is used to force a pause
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PauseBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('p');
+            ChooseDirection(true);
+        }
+        /// <summary>
+        /// This is used to split the string via the pipe symbol and then write it to the list
+        /// </summary>
+        /// <param name="text"></param>
+        private void DelimitString(string text)
+        {
+            var tempList = text.Split('|');
+            foreach (var localString in tempList)
+            {
+                if (!IdentifyChar(localString))
+                {
+                    SerialReturnsList.Items.Add(localString);
+                }
+            }
+        }
+        /// <summary>
+        /// This is used to force an override
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OverrideBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('o');
+            OverrideBtn.Visible = false;
+            CancelOverrideBtn.Visible = true;
+        }
+        /// <summary>
+        /// This Cancels the override
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CancelOverrideBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('n');
+            OverrideBtn.Visible = true;
+            CancelOverrideBtn.Visible = false;
         }
     }
 }
