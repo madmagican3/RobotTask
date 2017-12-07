@@ -20,6 +20,8 @@ boolean pause = false; //this is used to turn the corners
 boolean returning = false; //This is used to indicate if the system should return
 char path[100];//This array is used as a list in order to work out the turns the arduino is taking
 int pathLength =0;//This is used to keep track of the actual length of the array above
+int roomList[100];//This is used to keep track of the rooms
+int roomNo = 0;//This is used to keep track of the actual length of the array above
 
 void setup()
 {
@@ -67,7 +69,7 @@ void loop()
      if (val == 'd'){//right
        path[pathLength] = 'd';
        pathLength += 1;
-       serial.println("Turning right");      
+       Serial.println("Turning right");      
        turnRight();
        checkChar('n');
      }else if (val == 'a'){//left
@@ -75,19 +77,20 @@ void loop()
        pathLength += 1;
        Serial.println("Turning left");
        turnLeft();
-       checkChar('n')
+       checkChar('n');
      }
    }
    
     delay(150);
 }
 
+//This runs until the serial array is connected to via the c# program 
 void connectToProgram(){
-  bool notConnected = true;
-  while (notConnected){
+  while (true){
       char val = Serial.read();
-      if (val = 'c'){
+      if (val == 'c'){
         Serial.println('d');
+        delay(1000);
         return;
       }
       delay(50);
@@ -125,7 +128,7 @@ void calibrate(){
   //inform the user that we want to start calibrating then wait for button
     reflectanceSensors.init();
     digitalWrite(ledPin, HIGH);
-    Serial.println("Please place the zumo facing a black line in order to allow for calibration");
+    Serial.println("Please place the zumo facing a black line in order to allow for calibration"); 
     button.waitForButton();
     //Calibrate the sensors
     for (int i = 1; i < 7; i++){
@@ -146,17 +149,18 @@ void calibrate(){
     //Stop and wait to be put into the ready position
 }
 
+//This should be the default run if we're using the system 
 void runMaze(){
   reflectanceSensors.readCalibrated(sensorArr);
     for (byte i = 0; i < 6; i++)
       {
         reflectanceSensors.readLine(sensorArr);
         Serial.println(sensorArr[i]);
-        if (sensorArr[i] > threshold)
+        if (sensorArr[i] > threshold)//if we've encountered a wall
         {
-          stop();
-          Serial.println("Wall detected");
-          checkChar('p');
+          Serial.println("Wall detected in corridor " + pathLength+1);//as specified in the spec, we tell them the corridor no, which is pathlength +1 (as we dont start on the 0th indice
+          //for human counting
+          checkChar('p');//This will pause the run
           return;
         }
       }

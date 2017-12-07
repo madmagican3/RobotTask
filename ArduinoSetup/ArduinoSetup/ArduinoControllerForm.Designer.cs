@@ -47,6 +47,7 @@
             this.Controls.Add(this.SerialReturnsList);
             this.Name = "ArduinoControllerForm";
             this.Text = "ArduinoControllerForm";
+            this.Load += new System.EventHandler(this.ArduinoControllerForm_Load);
             this.ResumeLayout(false);
 
         }

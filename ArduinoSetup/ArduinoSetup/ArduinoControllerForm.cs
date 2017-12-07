@@ -13,6 +13,16 @@ namespace ArduinoSetup
         /// </summary>
         private SerialHandlerClass _localSerialInstance;
         /// <summary>
+        /// This is used in order to access the form from the serialHandlerClass
+        /// </summary>
+        /// <param name="text"></param>
+        public delegate void SetTextCallback(string text);
+        /// <summary>
+        /// This is used to indiciate if we should look for a number 
+        /// </summary>
+        private bool gettingWallNumber;
+
+        /// <summary>
         /// This will initalize the program and get the correct com port
         /// </summary>
         public ArduinoControllerForm()
@@ -40,8 +50,6 @@ namespace ArduinoSetup
                         {
                             //and if it's correct create a new instace of the serialhandlerclass
                             _localSerialInstance = new SerialHandlerClass(port, this);
-                            Thread thread = new Thread(new ThreadStart(_localSerialInstance.ReadChar));
-                            thread.Start();
                             break;
                         }
                     }
@@ -52,8 +60,11 @@ namespace ArduinoSetup
                 Console.WriteLine(ex.StackTrace);
             }
         }
-        //This should attempt to write to the arduino and if it's there it will respond and we know the correct port
-        
+        /// <summary>
+        /// This should attempt to write to the arduino, if it responds we know it's the correct port
+        /// </summary>
+        /// <param name="currentPort"></param>
+        /// <returns></returns>
         private bool DetectArduino(SerialPort currentPort)
         {
             try
@@ -62,7 +73,7 @@ namespace ArduinoSetup
                 currentPort.Write("c");
                 Thread.Sleep(1000);
 
-                String returnStr = currentPort.ReadLine();
+                var returnStr = currentPort.ReadLine();
                 currentPort.Close();
                 if (returnStr != "")
                 {
@@ -71,6 +82,65 @@ namespace ArduinoSetup
                 return false;
             }
             catch (Exception e)
+            {
+                return false;
+            }
+        }
+        /// <summary>
+        /// /This is used so we dont start the thread earlier than the rest of the system
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ArduinoControllerForm_Load(object sender, EventArgs e)
+        {
+            Thread thread = new Thread(new ThreadStart(_localSerialInstance.ReadChar));
+            thread.Start();
+        }
+        /// <summary>
+        /// This is used to update the list box from the serial handler class
+        /// </summary>
+        /// <param name="text"></param>
+        public void SetText(string text)
+        {
+            if (this.SerialReturnsList.InvokeRequired)
+            {
+                var d = new SetTextCallback(SetText);
+                this.Invoke(d, text);
+            }
+            else
+            {
+                if (!IdentifyChar(text))//if we cant identify the character
+                {
+                    this.SerialReturnsList.Items.Add(text);
+                }
+            }
+        }
+
+        /// <summary>
+        /// This will check to see if the chars are the ones we need to interact with
+        /// </summary>
+        public bool IdentifyChar(String localString)
+        {
+            int tempNo;
+            if (localString.Length <= 0)
+            {
+                return false;
+            }
+            var charArray = localString.ToCharArray();
+            // if we've encountered a wall
+            if (charArray[0] == 'w') // TODO make wall interaction here
+            {
+                this.SerialReturnsList.Items.Add("We've encountered a wall");
+                gettingWallNumber = true;
+                return true;
+            }
+            else if (gettingWallNumber && int.TryParse(localString, out tempNo))
+            {
+                this.SerialReturnsList.Items.Add("At corridor no " + tempNo);
+                gettingWallNumber = false;
+                return true;
+            }
+            else
             {
                 return false;
             }
