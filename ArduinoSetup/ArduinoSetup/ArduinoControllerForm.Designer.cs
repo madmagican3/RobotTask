@@ -34,6 +34,9 @@
             this.PauseBtn = new System.Windows.Forms.Button();
             this.OverrideBtn = new System.Windows.Forms.Button();
             this.CancelOverrideBtn = new System.Windows.Forms.Button();
+            this.RoomOrCorridor = new System.Windows.Forms.ComboBox();
+            this.Resume = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // SerialReturnsList
@@ -98,11 +101,46 @@
             this.CancelOverrideBtn.Visible = false;
             this.CancelOverrideBtn.Click += new System.EventHandler(this.CancelOverrideBtn_Click);
             // 
+            // RoomOrCorridor
+            // 
+            this.RoomOrCorridor.FormattingEnabled = true;
+            this.RoomOrCorridor.Items.AddRange(new object[] {
+            "Corridor",
+            "Room"});
+            this.RoomOrCorridor.Location = new System.Drawing.Point(119, 60);
+            this.RoomOrCorridor.Name = "RoomOrCorridor";
+            this.RoomOrCorridor.Size = new System.Drawing.Size(121, 21);
+            this.RoomOrCorridor.TabIndex = 6;
+            this.RoomOrCorridor.Visible = false;
+            // 
+            // Resume
+            // 
+            this.Resume.Location = new System.Drawing.Point(140, 162);
+            this.Resume.Name = "Resume";
+            this.Resume.Size = new System.Drawing.Size(75, 23);
+            this.Resume.TabIndex = 7;
+            this.Resume.Text = "Resume";
+            this.Resume.UseVisualStyleBackColor = true;
+            this.Resume.Visible = false;
+            this.Resume.Click += new System.EventHandler(this.Resume_Click);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(257, 299);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 8;
+            this.button1.Text = "Finish";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
             // ArduinoControllerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(793, 371);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.Resume);
+            this.Controls.Add(this.RoomOrCorridor);
             this.Controls.Add(this.CancelOverrideBtn);
             this.Controls.Add(this.OverrideBtn);
             this.Controls.Add(this.PauseBtn);
@@ -124,5 +162,8 @@
         private System.Windows.Forms.Button PauseBtn;
         private System.Windows.Forms.Button OverrideBtn;
         private System.Windows.Forms.Button CancelOverrideBtn;
+        private System.Windows.Forms.ComboBox RoomOrCorridor;
+        private System.Windows.Forms.Button Resume;
+        private System.Windows.Forms.Button button1;
     }
 }

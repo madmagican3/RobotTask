@@ -96,6 +96,7 @@ namespace ArduinoSetup
             Thread thread = new Thread(new ThreadStart(_localSerialInstance.ReadChar));
             thread.Start();
             ChooseDirection(false);
+            RoomOrCorridor.SelectedIndex = 0;
         }
         /// <summary>
         /// This is used to update the list box from the serial handler class
@@ -147,7 +148,7 @@ namespace ArduinoSetup
                 return true;
             }else if (charArray[0] == 'h' && charArray.Length == 1)
             { 
-                this.SerialReturnsList.Items.Add("Paused, please select a direction");
+                this.SerialReturnsList.Items.Add("Paused, please select a location");
                 ChooseDirection(true);
                 return true;
             }
@@ -164,7 +165,9 @@ namespace ArduinoSetup
         {
             RightBtn.Visible = activate;
             LeftBtn.Visible = activate;
+            RoomOrCorridor.Visible = activate;
             PauseBtn.Visible = !activate;
+            Resume.Visible = activate;
         }
         /// <summary>
         /// This is used to indicate our direction 
@@ -173,7 +176,14 @@ namespace ArduinoSetup
         /// <param name="e"></param>
         private void RightBtn_Click(object sender, EventArgs e)
         {
-            _localSerialInstance.SendChar('d');
+            if (RoomOrCorridor.SelectedIndex == 0)//If it's a corridor
+            {
+                _localSerialInstance.SendChar('d');
+            }
+            else//if it's a room
+            {
+                _localSerialInstance.SendChar('m');
+            }
             ChooseDirection(false);
         }
         /// <summary>
@@ -183,7 +193,14 @@ namespace ArduinoSetup
         /// <param name="e"></param>
         private void LeftBtn_Click(object sender, EventArgs e)
         {
-            _localSerialInstance.SendChar('a');
+            if (RoomOrCorridor.SelectedIndex == 1)//if it's a corridor
+            {
+                _localSerialInstance.SendChar('a');
+            }
+            else//if it's a room
+            {
+                _localSerialInstance.SendChar('b');
+            }
             ChooseDirection(false);
         }
         /// <summary>
@@ -219,8 +236,7 @@ namespace ArduinoSetup
         private void OverrideBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('o');
-            OverrideBtn.Visible = false;
-            CancelOverrideBtn.Visible = true;
+            OverrideController(false);
         }
         /// <summary>
         /// This Cancels the override
@@ -230,8 +246,20 @@ namespace ArduinoSetup
         private void CancelOverrideBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('n');
-            OverrideBtn.Visible = true;
-            CancelOverrideBtn.Visible = false;
+            OverrideController(true);
+        }
+
+        private void Resume_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('o');
+            ChooseDirection(false);
+
+        }
+
+        private void OverrideController(bool activate)
+        {
+            OverrideBtn.Visible = activate;
+            CancelOverrideBtn.Visible = activate;
         }
     }
 }

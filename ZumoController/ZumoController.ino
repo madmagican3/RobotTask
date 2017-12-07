@@ -20,7 +20,7 @@ boolean pause = false; //this is used to turn the corners
 boolean returning = false; //This is used to indicate if the system should return
 char path[100];//This array is used as a list in order to work out the turns the arduino is taking
 int pathLength =0;//This is used to keep track of the actual length of the array above
-int roomList[100];//This is used to keep track of the rooms
+int roomList[100];//This is used to keep track of the rooms, a is left with item, d is right with item, c is left with no item, v is right with no item
 int roomNo = 0;//This is used to keep track of the actual length of the array above
 
 void setup()
@@ -58,27 +58,61 @@ void loop()
     } 
    }
    
-   if (runningMaze){
+   if (runningMaze){//if we want it to run the maze normally
     runMaze();
    }
    
    if (pause){// if we're pausing to get it to check a corridor or a door
-     if (val == 'd'){//right
-       path[pathLength] = 'd';
-       pathLength += 1;
-       Serial.println("Turning right");      
-       turnRight();
-       checkChar('n');
-     }else if (val == 'a'){//left
-       path[pathLength] = 'a';
-       pathLength += 1;
-       Serial.println("Turning left");
-       turnLeft();
-       checkChar('n');
-     }
+     runPause(val);
    }
    
     delay(150);
+}
+
+//This should be the code to handle which direction we're going too after a pause
+public void runPause ( char val){
+     if (val == 'd'){//corridor right
+       path[pathLength] = 'd';
+       pathLength += 1;
+       Serial.println("Please turn me  right");      
+     }else if (val == 'a'){//corridor left
+       path[pathLength] = 'a';
+       pathLength += 1;
+       Serial.println("Please turn me left");
+     }else if (val =='b'){//roomLeft
+      roomList[roomNo] = checkRoom('a');
+      roomNo += 1;
+      checkChar('n');
+     }else if (val == 'm'){//roomRight
+      roomList[roomNo] = checkRoom('d');
+      roomNo += 1;
+      checkChar('n');
+     }
+}
+
+public char checkRoom(char leftRight){
+  Serial.println("Now searching room No |");
+  Serial.println(roomNo);
+  if (leftRight == 'm'){
+      Serial.println("| on the right|");
+  }else {
+    Serial.println("| on the left|";
+  }
+  if (checkItem()){
+    Serial.println("There is a person in there, that's bad!");
+    if (leftRight == 'a'){
+      return 'a';//left with item
+    }else {
+      return 'd';//right with item
+    }
+  }else {
+   Serial.println("Nothing here boss"); 
+   if (leftRight == 'a'){
+    return 'c';//left no item
+   }else {
+    return 'v';//right no item
+   }
+  }
 }
 
 //This runs until the serial array is connected to via the c# program 
