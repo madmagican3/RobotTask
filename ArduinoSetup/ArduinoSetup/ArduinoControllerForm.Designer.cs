@@ -33,10 +33,14 @@
             this.RightBtn = new System.Windows.Forms.Button();
             this.PauseBtn = new System.Windows.Forms.Button();
             this.OverrideBtn = new System.Windows.Forms.Button();
-            this.CancelOverrideBtn = new System.Windows.Forms.Button();
             this.RoomOrCorridor = new System.Windows.Forms.ComboBox();
             this.Resume = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.FinishOverride = new System.Windows.Forms.Button();
+            this.OFowardBtn = new System.Windows.Forms.Button();
+            this.OLeftBtn = new System.Windows.Forms.Button();
+            this.ORiightBtn = new System.Windows.Forms.Button();
+            this.OBackBtn = new System.Windows.Forms.Button();
+            this.OStopBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // SerialReturnsList
@@ -82,24 +86,13 @@
             // 
             // OverrideBtn
             // 
-            this.OverrideBtn.Location = new System.Drawing.Point(152, 288);
+            this.OverrideBtn.Location = new System.Drawing.Point(28, 282);
             this.OverrideBtn.Name = "OverrideBtn";
             this.OverrideBtn.Size = new System.Drawing.Size(75, 23);
             this.OverrideBtn.TabIndex = 4;
             this.OverrideBtn.Text = "Override";
             this.OverrideBtn.UseVisualStyleBackColor = true;
             this.OverrideBtn.Click += new System.EventHandler(this.OverrideBtn_Click);
-            // 
-            // CancelOverrideBtn
-            // 
-            this.CancelOverrideBtn.Location = new System.Drawing.Point(152, 318);
-            this.CancelOverrideBtn.Name = "CancelOverrideBtn";
-            this.CancelOverrideBtn.Size = new System.Drawing.Size(75, 23);
-            this.CancelOverrideBtn.TabIndex = 5;
-            this.CancelOverrideBtn.Text = "Resume Run";
-            this.CancelOverrideBtn.UseVisualStyleBackColor = true;
-            this.CancelOverrideBtn.Visible = false;
-            this.CancelOverrideBtn.Click += new System.EventHandler(this.CancelOverrideBtn_Click);
             // 
             // RoomOrCorridor
             // 
@@ -124,24 +117,79 @@
             this.Resume.Visible = false;
             this.Resume.Click += new System.EventHandler(this.Resume_Click);
             // 
-            // button1
+            // FinishOverride
             // 
-            this.button1.Location = new System.Drawing.Point(257, 299);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 8;
-            this.button1.Text = "Finish";
-            this.button1.UseVisualStyleBackColor = true;
+            this.FinishOverride.Location = new System.Drawing.Point(28, 311);
+            this.FinishOverride.Name = "FinishOverride";
+            this.FinishOverride.Size = new System.Drawing.Size(75, 23);
+            this.FinishOverride.TabIndex = 8;
+            this.FinishOverride.Text = "Finish";
+            this.FinishOverride.UseVisualStyleBackColor = true;
+            this.FinishOverride.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // OFowardBtn
+            // 
+            this.OFowardBtn.Location = new System.Drawing.Point(270, 262);
+            this.OFowardBtn.Name = "OFowardBtn";
+            this.OFowardBtn.Size = new System.Drawing.Size(75, 23);
+            this.OFowardBtn.TabIndex = 9;
+            this.OFowardBtn.Text = "Foward";
+            this.OFowardBtn.UseVisualStyleBackColor = true;
+            this.OFowardBtn.Click += new System.EventHandler(this.OFowardBtn_Click);
+            // 
+            // OLeftBtn
+            // 
+            this.OLeftBtn.Location = new System.Drawing.Point(177, 311);
+            this.OLeftBtn.Name = "OLeftBtn";
+            this.OLeftBtn.Size = new System.Drawing.Size(75, 23);
+            this.OLeftBtn.TabIndex = 10;
+            this.OLeftBtn.Text = "Left";
+            this.OLeftBtn.UseVisualStyleBackColor = true;
+            this.OLeftBtn.Click += new System.EventHandler(this.OLeftBtn_Click);
+            // 
+            // ORiightBtn
+            // 
+            this.ORiightBtn.Location = new System.Drawing.Point(348, 311);
+            this.ORiightBtn.Name = "ORiightBtn";
+            this.ORiightBtn.Size = new System.Drawing.Size(75, 23);
+            this.ORiightBtn.TabIndex = 11;
+            this.ORiightBtn.Text = "Right";
+            this.ORiightBtn.UseVisualStyleBackColor = true;
+            this.ORiightBtn.Click += new System.EventHandler(this.ORiightBtn_Click);
+            // 
+            // OBackBtn
+            // 
+            this.OBackBtn.Location = new System.Drawing.Point(267, 311);
+            this.OBackBtn.Name = "OBackBtn";
+            this.OBackBtn.Size = new System.Drawing.Size(75, 23);
+            this.OBackBtn.TabIndex = 12;
+            this.OBackBtn.Text = "Back";
+            this.OBackBtn.UseVisualStyleBackColor = true;
+            this.OBackBtn.Click += new System.EventHandler(this.OBackBtn_Click);
+            // 
+            // OStopBtn
+            // 
+            this.OStopBtn.Location = new System.Drawing.Point(270, 336);
+            this.OStopBtn.Name = "OStopBtn";
+            this.OStopBtn.Size = new System.Drawing.Size(75, 23);
+            this.OStopBtn.TabIndex = 13;
+            this.OStopBtn.Text = "Stop";
+            this.OStopBtn.UseVisualStyleBackColor = true;
+            this.OStopBtn.Click += new System.EventHandler(this.OStopBtn_Click);
             // 
             // ArduinoControllerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(793, 371);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.OStopBtn);
+            this.Controls.Add(this.OBackBtn);
+            this.Controls.Add(this.ORiightBtn);
+            this.Controls.Add(this.OLeftBtn);
+            this.Controls.Add(this.OFowardBtn);
+            this.Controls.Add(this.FinishOverride);
             this.Controls.Add(this.Resume);
             this.Controls.Add(this.RoomOrCorridor);
-            this.Controls.Add(this.CancelOverrideBtn);
             this.Controls.Add(this.OverrideBtn);
             this.Controls.Add(this.PauseBtn);
             this.Controls.Add(this.RightBtn);
@@ -161,9 +209,13 @@
         private System.Windows.Forms.Button RightBtn;
         private System.Windows.Forms.Button PauseBtn;
         private System.Windows.Forms.Button OverrideBtn;
-        private System.Windows.Forms.Button CancelOverrideBtn;
         private System.Windows.Forms.ComboBox RoomOrCorridor;
         private System.Windows.Forms.Button Resume;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button FinishOverride;
+        private System.Windows.Forms.Button OFowardBtn;
+        private System.Windows.Forms.Button OLeftBtn;
+        private System.Windows.Forms.Button ORiightBtn;
+        private System.Windows.Forms.Button OBackBtn;
+        private System.Windows.Forms.Button OStopBtn;
     }
 }

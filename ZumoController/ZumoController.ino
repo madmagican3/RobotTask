@@ -42,20 +42,7 @@ void loop()
    }
    
    if (overrideAutoRun){//if we've overidden the default system to control the robot manually
-     switch (val){
-      case 'd': d();
-        break;
-      case 's': s();
-        break;
-      case 'a':a();
-        break;
-      case 'w':w();
-       break;
-      case 'z':stop();
-        break;
-      default:
-        break; 
-    } 
+      ControllerOverride();
    }
    
    if (runningMaze){//if we want it to run the maze normally
@@ -68,9 +55,41 @@ void loop()
    
     delay(150);
 }
+//This controls the override of the system
+void ControllerOverride(){
+  bool FinishedOverride = false;
+  bool doneVBefore = false;
+  while (!FinishedOverride){
+     char val = Serial.read();
+     switch (val){
+      case 'd': d();
+        break;
+      case 's': s();
+        break;
+      case 'a':a();
+        break;
+      case 'w':w();
+       break;
+      case 'z':stop();
+        break;
+      case 'c': //this is the corridor case
+      finishedOverride = true;
+      break;
+      case 'v'://This is the room case
+      if (!doneVBefore){
+        checkItem();
+      }else {
+        finishedOverride = true;
+      }
+      break;
+      default:FinishedOverride = true;
+        break; 
+    } 
+  }
+}
 
 //This should be the code to handle which direction we're going too after a pause
-public void runPause ( char val){
+void runPause ( char val){
      if (val == 'd'){//corridor right
        path[pathLength] = 'd';
        pathLength += 1;
@@ -89,14 +108,14 @@ public void runPause ( char val){
       checkChar('n');
      }
 }
-
-public char checkRoom(char leftRight){
+//This should check the room
+char checkRoom(char leftRight){
   Serial.println("Now searching room No |");
   Serial.println(roomNo);
   if (leftRight == 'm'){
       Serial.println("| on the right|");
   }else {
-    Serial.println("| on the left|";
+    Serial.println("| on the left|");
   }
   if (checkItem()){
     Serial.println("There is a person in there, that's bad!");
@@ -244,6 +263,9 @@ void turnLeft(){//This should be a 90 degree turn (or as close as possible) for 
 }
 
 bool checkItem(){// returns true if there's an item within 10cm's
+  w();
+  delay (200);
+  stop();
   long duration, distance;
   digitalWrite(trigPin, LOW);  
   delayMicroseconds(2);

@@ -23,6 +23,11 @@ namespace ArduinoSetup
         private bool gettingWallNumber;
 
         /// <summary>
+        /// This is a cheap and easy way to work out if we've got to hide the override UI
+        /// </summary>
+        private int numberofTimesVCalled = 0;
+
+        /// <summary>
         /// This will initalize the program and get the correct com port
         /// </summary>
         public ArduinoControllerForm()
@@ -248,18 +253,77 @@ namespace ArduinoSetup
             _localSerialInstance.SendChar('n');
             OverrideController(true);
         }
-
+        /// <summary>
+        /// This will force an override upon clicking resume so that we can move the arduino
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Resume_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('o');
             ChooseDirection(false);
-
+            OverrideController(false);
         }
-
+        /// <summary>
+        /// This controls the buttons for overriding
+        /// </summary>
+        /// <param name="activate"></param>
         private void OverrideController(bool activate)
         {
             OverrideBtn.Visible = activate;
-            CancelOverrideBtn.Visible = activate;
+            FinishOverride.Visible = !activate;
+            OBackBtn.Visible = !activate;
+            OFowardBtn.Visible = !activate;
+            OLeftBtn.Visible = !activate;
+            ORiightBtn.Visible = !activate;
+        }
+        /// <summary>
+        /// This is for the finish override button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (RoomOrCorridor.SelectedIndex == 0) //if we're looking into a corridor
+            {
+                _localSerialInstance.SendChar('c');
+                OverrideController(false);
+            }
+            else
+            {
+                _localSerialInstance.SendChar('v');
+                if (numberofTimesVCalled % 2 != 0)
+                {
+                    OverrideController(true);
+                }
+                numberofTimesVCalled += 1;
+
+            }
+        }
+
+        private void OFowardBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('w');
+        }
+
+        private void OLeftBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('a');
+        }
+
+        private void OBackBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('s');
+        }
+
+        private void ORiightBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('d');
+        }
+
+        private void OStopBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('z');
         }
     }
 }
