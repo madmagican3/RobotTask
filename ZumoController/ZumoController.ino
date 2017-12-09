@@ -22,6 +22,9 @@ char path[100];//This array is used as a list in order to work out the turns the
 int pathLength =0;//This is used to keep track of the actual length of the array above
 int roomList[100];//This is used to keep track of the rooms, a is left with item, d is right with item, c is left with no item, v is right with no item
 int roomNo = 0;//This is used to keep track of the actual length of the array above
+char returnList[200];//This is going to be storing dupes and extra info above to construct an idea of the actual corridor in order to allow for optomization. chars used are
+//r = right, l = left, w = wall, b = 180 degree turn (end of corridor), z = end of corridor, k = room on left, l= room on right
+int returnLoc = 0;//This indicates what indicies of the returnList array we're on
 
 void setup()
 {
@@ -88,11 +91,52 @@ void ControllerOverride(){
   }
 }
 
+void optomizeRoute(){
+  /*char finalRoute[100];
+  int finalRouteLoc;
+  char subCorridor[50];
+  int subCorridorLoc;
+  bool inSubCorridor = false;
+  int[10] poppedRoomsList;
+  int poppedRoomsLoc;
+  for(int i = 0; i <= returnLoc ; i++){
+    if (returnList[i] == 'z'){//everytime we start a new sub corridor we want to set side corridor to true
+      inSubCorridor = !inSubCorridor;
+    }
+    if (inSubCorridor){//while we still are in the sub corridor add it to the sub corridor list
+      subCorridor[subCorridorLoc] = returnList[i];
+      subCorridorLoc += 1;
+    }
+    if (!inSubCorridor && subCorridorLoc > 0){//once we're out of the sub corridor
+      bool rooms = false;
+      for(int f = 0; f <= subCorridorLoc; f++){//check to see if we have any rooms which had items in them
+        if (subCorridor[f] == 1){
+          rooms = true;
+          poppedRoomsList[poppedRoomsLoc] = f;
+          poppedRoomsLoc += 1;
+        }
+      }
+      //r = right, l = left, w = wall, b = 180 degree turn (end of corridor), z = end of corridor, k = room on left, l= room on right
+      if (rooms){// if we do have rooms with items in them
+        char[50] tempRoute = SubCorridor;
+        for (int f = 0;f <=subCorridorLoc; f++){
+          if (subCorridor){
+            
+          }
+        }
+      }
+      subCorridor = new SubCorridor[50];
+      subCorridorLoc = 0;
+    }
+  }*/
+}
+
 //This should be the code to handle which direction we're going too after a pause
 void runPause ( char val){
      if (val == 'd'){//corridor right
        path[pathLength] = 'd';
        pathLength += 1;
+       
        Serial.println("Please turn me  right");      
      }else if (val == 'a'){//corridor left
        path[pathLength] = 'a';
@@ -212,9 +256,9 @@ void runMaze(){
         reflectanceSensors.readLine(sensorArr);
         if (sensorArr[i] > threshold)//if we've encountered a wall
         {
-          Serial.println("w|");//as specified in the spec, we tell them the corridor no, which is pathlength +1 (as we dont start on the 0th indice
+          Serial.println("w|");//as specified in the spec, we tell them the corridor no, which is pathlength +1 (as for human readability they wont care about the 0th indice)
           //for human counting
-          Serial.println(pathLength);
+          Serial.println(pathLength+1);
           delay(200);
           checkChar('p');//This will pause the run
           return;
