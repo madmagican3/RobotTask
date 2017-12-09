@@ -136,20 +136,30 @@ void runPause ( char val){
      if (val == 'd'){//corridor right
        path[pathLength] = 'd';
        pathLength += 1;
-       
+       returnList[returnLoc] = 'd';   
+       returnLoc +=1;
        Serial.println("Please turn me  right");      
      }else if (val == 'a'){//corridor left
        path[pathLength] = 'a';
        pathLength += 1;
+       returnList[returnLoc] = 'a';
+       returnLoc += 1;
        Serial.println("Please turn me left");
      }else if (val =='b'){//roomLeft
       roomList[roomNo] = checkRoom('a');
       roomNo += 1;
+      returnList[returnLoc] = 'k';
+      returnLoc += 1;
       checkChar('n');
      }else if (val == 'm'){//roomRight
       roomList[roomNo] = checkRoom('d');
       roomNo += 1;
+      returnList[returnLoc] = 'l';
+      returnLoc += 1;
       checkChar('n');
+     }else if (val == 'r'){
+      returnList[returnLoc] = 'b';
+      returnLoc += 1;
      }
 }
 //This should check the room
@@ -163,12 +173,16 @@ char checkRoom(char leftRight){
   }
   if (checkItem()){
     Serial.println("There is a person in there, that's bad!");
+    returnList[returnLoc] =1;
+    returnLoc += 1;
     if (leftRight == 'a'){
       return 'a';//left with item
     }else {
       return 'd';//right with item
     }
   }else {
+    returnList[returnLoc] = 0;
+    returnLoc += 1;
    Serial.println("Nothing here boss"); 
    if (leftRight == 'a'){
     return 'c';//left no item

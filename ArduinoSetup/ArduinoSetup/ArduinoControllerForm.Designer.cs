@@ -41,6 +41,7 @@
             this.ORiightBtn = new System.Windows.Forms.Button();
             this.OBackBtn = new System.Windows.Forms.Button();
             this.OStopBtn = new System.Windows.Forms.Button();
+            this.BackBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // SerialReturnsList
@@ -177,11 +178,22 @@
             this.OStopBtn.UseVisualStyleBackColor = true;
             this.OStopBtn.Click += new System.EventHandler(this.OStopBtn_Click);
             // 
+            // BackBtn
+            // 
+            this.BackBtn.Location = new System.Drawing.Point(140, 129);
+            this.BackBtn.Name = "BackBtn";
+            this.BackBtn.Size = new System.Drawing.Size(75, 23);
+            this.BackBtn.TabIndex = 15;
+            this.BackBtn.Text = "Back";
+            this.BackBtn.UseVisualStyleBackColor = true;
+            this.BackBtn.Click += new System.EventHandler(this.BackBtn_Click);
+            // 
             // ArduinoControllerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(793, 371);
+            this.Controls.Add(this.BackBtn);
             this.Controls.Add(this.OStopBtn);
             this.Controls.Add(this.OBackBtn);
             this.Controls.Add(this.ORiightBtn);
@@ -217,5 +229,6 @@
         private System.Windows.Forms.Button ORiightBtn;
         private System.Windows.Forms.Button OBackBtn;
         private System.Windows.Forms.Button OStopBtn;
+        private System.Windows.Forms.Button BackBtn;
     }
 }

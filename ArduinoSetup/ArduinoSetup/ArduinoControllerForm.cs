@@ -170,6 +170,7 @@ namespace ArduinoSetup
         {
             RightBtn.Visible = activate;
             LeftBtn.Visible = activate;
+            BackBtn.Visible = activate;
             RoomOrCorridor.Visible = activate;
             PauseBtn.Visible = !activate;
             Resume.Visible = activate;
@@ -324,6 +325,11 @@ namespace ArduinoSetup
         private void OStopBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('z');
+        }
+
+        private void BackBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('r');
         }
     }
 }
