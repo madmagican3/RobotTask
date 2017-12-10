@@ -91,6 +91,14 @@ void ControllerOverride(){
   }
 }
 
+
+//TODO, found a way to do this, basically what i'm going to need to do is upon every wall or pause start a new corridor
+//I get 48 of them by doing (int) to a char which is less than 48. Therefore i can eep a track of all of them and just search
+//them for populated rooms. This will let me know where they start and end. Due to the number i can also keep track of
+//the ones coming off them, i.e. if it includes a back i can know that it's an end corridor, while if i dont i know it's a connector
+//Need to change data collection for this assumption
+//This will also allow me to do the go back thing without a scanning of each direction i turn, because ones with back go back to the original corridor
+//and if that corridor has no other turns it can make it means that it's done, so we know it can go back to the start of the corridor
 void optomizeRoute(){
   /*char finalRoute[100];
   int finalRouteLoc;
@@ -160,6 +168,7 @@ void runPause ( char val){
      }else if (val == 'r'){
       returnList[returnLoc] = 'b';
       returnLoc += 1;
+      returnToCorridor();
      }
 }
 //This should check the room
