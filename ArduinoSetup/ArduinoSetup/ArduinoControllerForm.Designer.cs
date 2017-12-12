@@ -42,6 +42,7 @@
             this.OBackBtn = new System.Windows.Forms.Button();
             this.OStopBtn = new System.Windows.Forms.Button();
             this.BackBtn = new System.Windows.Forms.Button();
+            this.FowardBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // SerialReturnsList
@@ -101,7 +102,7 @@
             this.RoomOrCorridor.Items.AddRange(new object[] {
             "Corridor",
             "Room"});
-            this.RoomOrCorridor.Location = new System.Drawing.Point(119, 60);
+            this.RoomOrCorridor.Location = new System.Drawing.Point(28, 60);
             this.RoomOrCorridor.Name = "RoomOrCorridor";
             this.RoomOrCorridor.Size = new System.Drawing.Size(121, 21);
             this.RoomOrCorridor.TabIndex = 6;
@@ -184,15 +185,27 @@
             this.BackBtn.Name = "BackBtn";
             this.BackBtn.Size = new System.Drawing.Size(75, 23);
             this.BackBtn.TabIndex = 15;
-            this.BackBtn.Text = "Back";
+            this.BackBtn.Text = "Return";
             this.BackBtn.UseVisualStyleBackColor = true;
+            this.BackBtn.Visible = false;
             this.BackBtn.Click += new System.EventHandler(this.BackBtn_Click);
+            // 
+            // FowardBtn
+            // 
+            this.FowardBtn.Location = new System.Drawing.Point(140, 100);
+            this.FowardBtn.Name = "FowardBtn";
+            this.FowardBtn.Size = new System.Drawing.Size(75, 23);
+            this.FowardBtn.TabIndex = 16;
+            this.FowardBtn.Text = "Foward";
+            this.FowardBtn.UseVisualStyleBackColor = true;
+            this.FowardBtn.Visible = false;
             // 
             // ArduinoControllerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(793, 371);
+            this.Controls.Add(this.FowardBtn);
             this.Controls.Add(this.BackBtn);
             this.Controls.Add(this.OStopBtn);
             this.Controls.Add(this.OBackBtn);
@@ -230,5 +243,6 @@
         private System.Windows.Forms.Button OBackBtn;
         private System.Windows.Forms.Button OStopBtn;
         private System.Windows.Forms.Button BackBtn;
+        private System.Windows.Forms.Button FowardBtn;
     }
 }

@@ -76,13 +76,13 @@ void ControllerOverride(){
       case 'z':stop();
         break;
       case 'c': //this is the corridor case
-      finishedOverride = true;
+       FinishedOverride = true;
       break;
       case 'v'://This is the room case
       if (!doneVBefore){
         checkItem();
       }else {
-        finishedOverride = true;
+        FinishedOverride = true;
       }
       break;
       default:FinishedOverride = true;
@@ -99,6 +99,8 @@ void ControllerOverride(){
 //Need to change data collection for this assumption
 //This will also allow me to do the go back thing without a scanning of each direction i turn, because ones with back go back to the original corridor
 //and if that corridor has no other turns it can make it means that it's done, so we know it can go back to the start of the corridor
+
+//also change the check wall code to also turn away if only one of the far side sensors is showing wall by like a small degree, 5 second fix
 void optomizeRoute(){
   /*char finalRoute[100];
   int finalRouteLoc;
@@ -168,7 +170,7 @@ void runPause ( char val){
      }else if (val == 'r'){
       returnList[returnLoc] = 'b';
       returnLoc += 1;
-      returnToCorridor();
+     // returnToCorridor();
      }
 }
 //This should check the room
@@ -277,7 +279,8 @@ void runMaze(){
     for (byte i = 0; i < 6; i++)
       {
         reflectanceSensors.readLine(sensorArr);
-        if (sensorArr[i] > threshold)//if we've encountered a wall
+      }
+      if ( sensorArr[5] > threshold && sensorArr[0])//if we've encountered a wall
         {
           Serial.println("w|");//as specified in the spec, we tell them the corridor no, which is pathlength +1 (as for human readability they wont care about the 0th indice)
           //for human counting
@@ -286,10 +289,21 @@ void runMaze(){
           checkChar('p');//This will pause the run
           return;
         }
+      else if (sensorArr[0] > threshold){//if we're running into a wall on the left
+        adjustLeft();
+      }else if (sensorArr[5] > threshold) {//if we're running into a wall on the right
+        adjustRight();
       }
      w();
 }
-
+void adjustLeft(){//This should adjust the zumo left to stay within the walls
+  motors.setLeftSpeed(speed);
+  delay (50);
+}
+void adjustRight(){//This should adjust the zumo right to stay within the walls
+  motors.setRightSpeed(speed);
+  delay(50);
+}
 
 void w (){//foward
   motors.setLeftSpeed (speed);
