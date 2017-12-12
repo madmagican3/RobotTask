@@ -199,6 +199,7 @@
             this.FowardBtn.Text = "Foward";
             this.FowardBtn.UseVisualStyleBackColor = true;
             this.FowardBtn.Visible = false;
+            this.FowardBtn.Click += new System.EventHandler(this.FowardBtn_Click);
             // 
             // ArduinoControllerForm
             // 

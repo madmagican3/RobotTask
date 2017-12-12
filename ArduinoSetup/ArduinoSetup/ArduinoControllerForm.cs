@@ -331,5 +331,10 @@ namespace ArduinoSetup
         {
             _localSerialInstance.SendChar('r');
         }
+
+        private void FowardBtn_Click(object sender, EventArgs e)
+        {
+            _localSerialInstance.SendChar('f');
+        }
     }
 }
