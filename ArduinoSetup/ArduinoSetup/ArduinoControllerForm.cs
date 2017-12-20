@@ -26,6 +26,10 @@ namespace ArduinoSetup
         /// This is a cheap and easy way to work out if we've got to hide the override UI
         /// </summary>
         private int numberofTimesVCalled = 0;
+        /// <summary>
+        /// This is used to keep track on if we hit a wall as we want different options available if we hit a wall
+        /// </summary>
+        private bool hitWall = false;
 
         /// <summary>
         /// This will initalize the program and get the correct com port
@@ -34,6 +38,8 @@ namespace ArduinoSetup
         {
             InitializeComponent();
             DetectArduinoPort();
+            OverrideController(false);
+            ChooseDirection(false);
         }
         /// <summary>
         /// This detects the com port
@@ -143,6 +149,7 @@ namespace ArduinoSetup
             if (charArray[0] == 'w' && charArray.Length == 1) 
             {
                 this.SerialReturnsList.Items.Add("We've encountered a wall");
+                hitWall = true;
                 gettingWallNumber = true;
                 return true;
             }
@@ -164,6 +171,7 @@ namespace ArduinoSetup
         }
         /// <summary>
         /// This enabled or disables the buttons for choosing direction depending on the bool passed
+        /// false is hiding everything but pause and true is making them visible
         /// </summary>
         /// <param name="activate"></param>
         public void ChooseDirection(bool activate)
@@ -174,6 +182,7 @@ namespace ArduinoSetup
             RoomOrCorridor.Visible = activate;
             PauseBtn.Visible = !activate;
             Resume.Visible = activate;
+            label1.Visible = activate;
         }
         /// <summary>
         /// This is used to indicate our direction 
@@ -255,23 +264,22 @@ namespace ArduinoSetup
             OverrideController(true);
         }
         /// <summary>
-        /// This will force an override upon clicking resume so that we can move the arduino
+        /// This will resume normal running if we accidently hit pause
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Resume_Click(object sender, EventArgs e)
         {
-            _localSerialInstance.SendChar('o');
+            _localSerialInstance.SendChar('n');
             ChooseDirection(false);
             OverrideController(false);
         }
         /// <summary>
-        /// This controls the buttons for overriding
+        /// This controls the buttons for overriding, true if you want to disable everything, false if you want to enable everything
         /// </summary>
         /// <param name="activate"></param>
         private void OverrideController(bool activate)
         {
-            OverrideBtn.Visible = activate;
             FinishOverride.Visible = !activate;
             OBackBtn.Visible = !activate;
             OFowardBtn.Visible = !activate;
@@ -296,40 +304,62 @@ namespace ArduinoSetup
                 if (numberofTimesVCalled % 2 != 0)
                 {
                     OverrideController(true);
+                    return;
                 }
                 numberofTimesVCalled += 1;
-
+                SerialReturnsList.Items.Add(
+                    "The robot is checking the room, once that is done please reverse it back into the corridor");
             }
         }
-
+        /// <summary>
+        /// override foward button sends the character to go foward
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OFowardBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('w');
         }
-
+        /// <summary>
+        /// override left button sends the character to turn left
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OLeftBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('a');
         }
-
+        /// <summary>
+        /// Override back button sends the character to reverse
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OBackBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('s');
         }
-
+        /// <summary>
+        /// override right button sends the char to turn right
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ORiightBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('d');
         }
-
+        /// <summary>
+        /// Override stop button sends the character to stop
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OStopBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('z');
         }
-
         private void BackBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('r');
+
         }
 
         private void FowardBtn_Click(object sender, EventArgs e)

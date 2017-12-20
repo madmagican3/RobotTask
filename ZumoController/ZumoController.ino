@@ -36,7 +36,7 @@ void setup()
   calibrate();
 }
 
-void loop()
+void loop() 
 {
    char val = Serial.read();
    checkChar(val);
@@ -58,6 +58,7 @@ void loop()
    
     delay(150);
 }
+
 //This controls the override of the system
 void ControllerOverride(){
   bool FinishedOverride = false;
@@ -85,7 +86,7 @@ void ControllerOverride(){
         FinishedOverride = true;
       }
       break;
-      default:FinishedOverride = true;
+      default:
         break; 
     } 
   }
@@ -100,7 +101,10 @@ void ControllerOverride(){
 //This will also allow me to do the go back thing without a scanning of each direction i turn, because ones with back go back to the original corridor
 //and if that corridor has no other turns it can make it means that it's done, so we know it can go back to the start of the corridor
 
-//also change the check wall code to also turn away if only one of the far side sensors is showing wall by like a small degree, 5 second fix
+void returnToCorridor(){
+  
+}
+
 void optomizeRoute(){
   /*char finalRoute[100];
   int finalRouteLoc;
@@ -146,32 +150,21 @@ void runPause ( char val){
      if (val == 'd'){//corridor right
        path[pathLength] = 'd';
        pathLength += 1;
-       returnList[returnLoc] = 'd';   
-       returnLoc +=1;
        Serial.println("Please turn me  right");      
      }else if (val == 'a'){//corridor left
        path[pathLength] = 'a';
        pathLength += 1;
-       returnList[returnLoc] = 'a';
-       returnLoc += 1;
        Serial.println("Please turn me left");
      }else if (val =='b'){//roomLeft
       roomList[roomNo] = checkRoom('a');
       roomNo += 1;
-      returnList[returnLoc] = 'k';
-      returnLoc += 1;
-      checkChar('n');
      }else if (val == 'm'){//roomRight
       roomList[roomNo] = checkRoom('d');
       roomNo += 1;
-      returnList[returnLoc] = 'l';
-      returnLoc += 1;
-      checkChar('n');
      }else if (val == 'r'){
-      returnList[returnLoc] = 'b';
-      returnLoc += 1;
-     // returnToCorridor();
+      returnToCorridor();
      }
+     checkChar('o');
 }
 //This should check the room
 char checkRoom(char leftRight){
@@ -184,16 +177,12 @@ char checkRoom(char leftRight){
   }
   if (checkItem()){
     Serial.println("There is a person in there, that's bad!");
-    returnList[returnLoc] =1;
-    returnLoc += 1;
     if (leftRight == 'a'){
       return 'a';//left with item
     }else {
       return 'd';//right with item
     }
   }else {
-    returnList[returnLoc] = 0;
-    returnLoc += 1;
    Serial.println("Nothing here boss"); 
    if (leftRight == 'a'){
     return 'c';//left no item
@@ -212,7 +201,6 @@ void connectToProgram(){
         delay(1000);
         return;
       }
-      delay(50);
   }
 }
 
@@ -248,13 +236,12 @@ void calibrate(){
   //inform the user that we want to start calibrating then wait for button
   delay(100);
     reflectanceSensors.init();
-    digitalWrite(ledPin, HIGH);
+    //digitalWrite(ledPin, HIGH);
     Serial.println("Please place the zumo facing a black line in order to allow for calibration|"); 
     Serial.println("Then please press the button on the zumo once that is done");
     button.waitForButton();
     //Calibrate the sensors
     for (int i = 1; i < 7; i++){
-      delay (1500);      
       reflectanceSensors.calibrate();
       if (i % 2 == 0){
         motors.setLeftSpeed(-50);
@@ -262,7 +249,9 @@ void calibrate(){
       }else{
         motors.setLeftSpeed(50);
         motors.setRightSpeed(50);
-      }      
+      }   
+      delay (1500);   
+      stop();      
     } 
     stop();
     digitalWrite(ledPin, LOW);
@@ -280,7 +269,7 @@ void runMaze(){
       {
         reflectanceSensors.readLine(sensorArr);
       }
-      if ( sensorArr[5] > threshold && sensorArr[0])//if we've encountered a wall
+      if ( sensorArr[3] > threshold && sensorArr[2] > threshold)//if we've encountered a wall
         {
           Serial.println("w|");//as specified in the spec, we tell them the corridor no, which is pathlength +1 (as for human readability they wont care about the 0th indice)
           //for human counting
