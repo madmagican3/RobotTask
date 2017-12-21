@@ -38,7 +38,7 @@ namespace ArduinoSetup
         {
             InitializeComponent();
             DetectArduinoPort();
-            OverrideController(false);
+            OverrideController(true);
             ChooseDirection(false);
         }
         /// <summary>
@@ -191,15 +191,9 @@ namespace ArduinoSetup
         /// <param name="e"></param>
         private void RightBtn_Click(object sender, EventArgs e)
         {
-            if (RoomOrCorridor.SelectedIndex == 0)//If it's a corridor
-            {
-                _localSerialInstance.SendChar('d');
-            }
-            else//if it's a room
-            {
-                _localSerialInstance.SendChar('m');
-            }
+            _localSerialInstance.SendChar(RoomOrCorridor.SelectedIndex == 0 ? 'd' : 'm');
             ChooseDirection(false);
+            OverrideController(false);
         }
         /// <summary>
         /// This is used to indicate our direction
@@ -208,15 +202,9 @@ namespace ArduinoSetup
         /// <param name="e"></param>
         private void LeftBtn_Click(object sender, EventArgs e)
         {
-            if (RoomOrCorridor.SelectedIndex == 1)//if it's a corridor
-            {
-                _localSerialInstance.SendChar('a');
-            }
-            else//if it's a room
-            {
-                _localSerialInstance.SendChar('b');
-            }
+            _localSerialInstance.SendChar(RoomOrCorridor.SelectedIndex == 0 ? 'a' : 'b');
             ChooseDirection(false);
+            OverrideController(false);
         }
         /// <summary>
         /// This is used to force a pause
@@ -285,6 +273,7 @@ namespace ArduinoSetup
             OFowardBtn.Visible = !activate;
             OLeftBtn.Visible = !activate;
             ORiightBtn.Visible = !activate;
+            OStopBtn.Visible = !activate;
         }
         /// <summary>
         /// This is for the finish override button
@@ -296,7 +285,7 @@ namespace ArduinoSetup
             if (RoomOrCorridor.SelectedIndex == 0) //if we're looking into a corridor
             {
                 _localSerialInstance.SendChar('c');
-                OverrideController(false);
+                OverrideController(true);
             }
             else
             {
@@ -356,12 +345,22 @@ namespace ArduinoSetup
         {
             _localSerialInstance.SendChar('z');
         }
+
+        /// <summary>
+        /// this should send the return character
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BackBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('r');
 
         }
-
+        /// <summary>
+        /// This should send the foward character to mark a room or corridor as being in front
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FowardBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('f');

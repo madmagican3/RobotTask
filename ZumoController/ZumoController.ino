@@ -13,7 +13,7 @@ ZumoReflectanceSensorArray reflectanceSensors;
 
 int sensorArr[6];//This defines the sensor array
 int speed = 100;//This is the speed the robot should run at 
-int threshold = 500;//this is the colour threshold for the sensors
+int threshold = 300;//this is the colour threshold for the sensors
 boolean overrideAutoRun = false; // This should be false until you want to override it to control the system manually
 boolean runningMaze = true;//this should be true until the program needs to auto solve the map
 boolean pause = false; //this is used to turn the corners
@@ -77,13 +77,16 @@ void ControllerOverride(){
       case 'z':stop();
         break;
       case 'c': //this is the corridor case
+      Serial.println("i recieved a c");
        FinishedOverride = true;
+       checkChar('n');
       break;
       case 'v'://This is the room case
       if (!doneVBefore){
         checkItem();
       }else {
         FinishedOverride = true;
+        checkChar('n');
       }
       break;
       default:
@@ -150,21 +153,25 @@ void runPause ( char val){
      if (val == 'd'){//corridor right
        path[pathLength] = 'd';
        pathLength += 1;
-       Serial.println("Please turn me  right");      
+       Serial.println("Please turn me  right"); 
+            checkChar('o');     
      }else if (val == 'a'){//corridor left
        path[pathLength] = 'a';
        pathLength += 1;
        Serial.println("Please turn me left");
+            checkChar('o');
      }else if (val =='b'){//roomLeft
       roomList[roomNo] = checkRoom('a');
       roomNo += 1;
+           checkChar('o');
      }else if (val == 'm'){//roomRight
       roomList[roomNo] = checkRoom('d');
       roomNo += 1;
+           checkChar('o');
      }else if (val == 'r'){
       returnToCorridor();
+           checkChar('o');
      }
-     checkChar('o');
 }
 //This should check the room
 char checkRoom(char leftRight){
@@ -242,7 +249,6 @@ void calibrate(){
     button.waitForButton();
     //Calibrate the sensors
     for (int i = 1; i < 7; i++){
-      reflectanceSensors.calibrate();
       if (i % 2 == 0){
         motors.setLeftSpeed(-50);
         motors.setRightSpeed(-50);
@@ -250,7 +256,11 @@ void calibrate(){
         motors.setLeftSpeed(50);
         motors.setRightSpeed(50);
       }   
-      delay (1500);   
+      unsigned long currentMillis = millis() + 2000;
+      while (millis() < currentMillis ){
+        
+              reflectanceSensors.calibrate();
+      }
       stop();      
     } 
     stop();
@@ -264,18 +274,19 @@ void calibrate(){
 
 //This should be the default run if we're using the system 
 void runMaze(){
-  reflectanceSensors.readCalibrated(sensorArr);
     for (byte i = 0; i < 6; i++)
       {
-        reflectanceSensors.readLine(sensorArr);
+        reflectanceSensors.readCalibrated(sensorArr);
       }
-      if ( sensorArr[3] > threshold && sensorArr[2] > threshold)//if we've encountered a wall
+      
+      if ( sensorArr[0] > threshold && sensorArr[5] > threshold)//if we've encountered a wall
         {
+          stop();
           Serial.println("w|");//as specified in the spec, we tell them the corridor no, which is pathlength +1 (as for human readability they wont care about the 0th indice)
           //for human counting
           Serial.println(pathLength+1);
-          delay(200);
           checkChar('p');//This will pause the run
+          delay(200);
           return;
         }
       else if (sensorArr[0] > threshold){//if we're running into a wall on the left
@@ -286,12 +297,10 @@ void runMaze(){
      w();
 }
 void adjustLeft(){//This should adjust the zumo left to stay within the walls
-  motors.setLeftSpeed(speed);
-  delay (50);
+  motors.setLeftSpeed(speed*2);
 }
 void adjustRight(){//This should adjust the zumo right to stay within the walls
-  motors.setRightSpeed(speed);
-  delay(50);
+  motors.setRightSpeed(speed*2);
 }
 
 void w (){//foward
