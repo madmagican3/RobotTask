@@ -39,6 +39,9 @@ void setup()
 
 void loop() 
 {
+  Serial.println(checkItem());
+  return;
+  //TODO remove
    char val = Serial.read();
    checkChar(val);
    if (returning){// if we're returning
@@ -84,11 +87,9 @@ void ControllerOverride(){
       case 'v'://This is the room case
       Serial.println("v case");
       if (!doneVBefore){
-        Serial.println("Attempting to check room");
         isRoomPopped = checkItem();
         doneVBefore = true;
       }else {
-        Serial.println("else case");
         FinishedOverride = true;
         break;
       }
@@ -184,10 +185,8 @@ char checkRoom(char leftRight){
       Serial.println("| on the right|");
   }else {
     Serial.println("| on the left|");
-  }
-  Serial.println("Please point me in the correct direction");
+  } 
   ControllerOverride();
-  Serial.println("finished the controller override");
   if (isRoomPopped){
     Serial.println("There is a person in there, that's bad!");
     if (leftRight == 'a'){
@@ -203,6 +202,7 @@ char checkRoom(char leftRight){
     return 'v';//right no item
    }
   }
+  checkChar('n');
 }
 
 //This runs until the serial array is connected to via the c# program 
@@ -347,9 +347,9 @@ void turnLeft(){//This should be a 90 degree turn (or as close as possible) for 
 }
 
 bool checkItem(){// returns true if there's an item within 10cm's
-  w();
+/*  w();
   delay (200);
-  stop();
+  stop();*/
   long duration, distance;
   digitalWrite(trigPin, LOW);  
   delayMicroseconds(2);
@@ -358,12 +358,13 @@ bool checkItem(){// returns true if there's an item within 10cm's
   digitalWrite(trigPin, LOW);
   duration = pulseIn(echoPin, HIGH);
   distance = (duration/2) / 29.1;
-  Serial.println("Please turn me back in the correct direction");
+  Serial.print(distance);
+ // Serial.println("Please turn me back in the correct direction");
   if (distance<10){
-    Serial.println("I've noticed an item");
-    return true;
+  //  Serial.println("I've noticed an item");
+    return false;
   }
-  return false;
+  return true;
 }
 
 
