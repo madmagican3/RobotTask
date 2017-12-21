@@ -25,6 +25,7 @@ int roomNo = 0;//This is used to keep track of the actual length of the array ab
 char returnList[200];//This is going to be storing dupes and extra info above to construct an idea of the actual corridor in order to allow for optomization. chars used are
 //r = right, l = left, w = wall, b = 180 degree turn (end of corridor), z = end of corridor, k = room on left, l= room on right
 int returnLoc = 0;//This indicates what indicies of the returnList array we're on
+bool isRoomPopped = false; // this is used to pass stuff from the override controller to the room checker
 
 void setup()
 {
@@ -77,16 +78,19 @@ void ControllerOverride(){
       case 'z':stop();
         break;
       case 'c': //this is the corridor case
-      Serial.println("i recieved a c");
        FinishedOverride = true;
        checkChar('n');
       break;
       case 'v'://This is the room case
+      Serial.println("v case");
       if (!doneVBefore){
-        checkItem();
+        Serial.println("Attempting to check room");
+        isRoomPopped = checkItem();
+        doneVBefore = true;
       }else {
+        Serial.println("else case");
         FinishedOverride = true;
-        checkChar('n');
+        break;
       }
       break;
       default:
@@ -150,6 +154,7 @@ void optomizeRoute(){
 
 //This should be the code to handle which direction we're going too after a pause
 void runPause ( char val){
+  stop();
      if (val == 'd'){//corridor right
        path[pathLength] = 'd';
        pathLength += 1;
@@ -163,11 +168,9 @@ void runPause ( char val){
      }else if (val =='b'){//roomLeft
       roomList[roomNo] = checkRoom('a');
       roomNo += 1;
-           checkChar('o');
      }else if (val == 'm'){//roomRight
       roomList[roomNo] = checkRoom('d');
       roomNo += 1;
-           checkChar('o');
      }else if (val == 'r'){
       returnToCorridor();
            checkChar('o');
@@ -176,13 +179,16 @@ void runPause ( char val){
 //This should check the room
 char checkRoom(char leftRight){
   Serial.println("Now searching room No |");
-  Serial.println(roomNo);
+  Serial.println(roomNo+1);
   if (leftRight == 'm'){
       Serial.println("| on the right|");
   }else {
     Serial.println("| on the left|");
   }
-  if (checkItem()){
+  Serial.println("Please point me in the correct direction");
+  ControllerOverride();
+  Serial.println("finished the controller override");
+  if (isRoomPopped){
     Serial.println("There is a person in there, that's bad!");
     if (leftRight == 'a'){
       return 'a';//left with item
@@ -278,7 +284,6 @@ void runMaze(){
       {
         reflectanceSensors.readCalibrated(sensorArr);
       }
-      
       if ( sensorArr[0] > threshold && sensorArr[5] > threshold)//if we've encountered a wall
         {
           stop();
@@ -353,11 +358,12 @@ bool checkItem(){// returns true if there's an item within 10cm's
   digitalWrite(trigPin, LOW);
   duration = pulseIn(echoPin, HIGH);
   distance = (duration/2) / 29.1;
-  Serial.println(distance);
+  Serial.println("Please turn me back in the correct direction");
   if (distance<10){
-    return false;
+    Serial.println("I've noticed an item");
+    return true;
   }
-  return true;
+  return false;
 }
 
 

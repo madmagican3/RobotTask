@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO.Ports;
 using System.Threading;
 using System.Windows.Forms;
@@ -40,7 +41,19 @@ namespace ArduinoSetup
             DetectArduinoPort();
             OverrideController(true);
             ChooseDirection(false);
+            this.Closing += ArduinoControllerFormOnClosing;
         }
+
+        /// <summary>
+        /// This is to shut down the listener thread upon exiting the form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void ArduinoControllerFormOnClosing(object sender, CancelEventArgs e)
+        {
+            Application.Exit();
+        }
+
         /// <summary>
         /// This detects the com port
         /// </summary>
