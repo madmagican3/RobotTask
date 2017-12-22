@@ -51,7 +51,7 @@ namespace ArduinoSetup
         /// <param name="e"></param>
         private static void ArduinoControllerFormOnClosing(object sender, CancelEventArgs e)
         {
-            Application.Exit();
+            Environment.Exit(0);
         }
 
         /// <summary>

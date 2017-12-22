@@ -39,9 +39,6 @@ void setup()
 
 void loop() 
 {
-  Serial.println(checkItem());
-  return;
-  //TODO remove
    char val = Serial.read();
    checkChar(val);
    if (returning){// if we're returning
@@ -85,7 +82,6 @@ void ControllerOverride(){
        checkChar('n');
       break;
       case 'v'://This is the room case
-      Serial.println("v case");
       if (!doneVBefore){
         isRoomPopped = checkItem();
         doneVBefore = true;
@@ -347,24 +343,34 @@ void turnLeft(){//This should be a 90 degree turn (or as close as possible) for 
 }
 
 bool checkItem(){// returns true if there's an item within 10cm's
-/*  w();
+  w();
   delay (200);
-  stop();*/
+  stop();
+  delay (1000);
+  //So as a note, i think this connection can be a little suspect, it'll sometimes just return a 0 for distance and duration when testing for extended periods of time
+  //then when i fiddle around with the wiring a little it'll return actual values for a bit and then back to returning nothing
+  //I'm not certain what's causing this so i'm going to add a delay above and also repeat this up to 10 times if the duration == 0
+  //This will not produce false positives as if it's really 0, it'll stay 0
   long duration, distance;
   digitalWrite(trigPin, LOW);  
-  delayMicroseconds(2);
+  delayMicroseconds(4);
   digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10); 
+  delayMicroseconds(20); 
   digitalWrite(trigPin, LOW);
-  duration = pulseIn(echoPin, HIGH);
-  distance = (duration/2) / 29.1;
-  Serial.print(distance);
- // Serial.println("Please turn me back in the correct direction");
-  if (distance<10){
-  //  Serial.println("I've noticed an item");
-    return false;
+  for (int i = 0; i <= 10;i++){
+    if (duration > 0){
+      break;
+    }
+    duration = pulseIn(echoPin, HIGH);
   }
-  return true;
+  distance = (duration/2) / 29.1;
+  Serial.println("Please turn me back in the correct direction");
+  if (distance<10&& distance != 0){//if distance is within 10 cms and is not 0, as duration not picking up anything for a decent period will be 0 due to timeout
+    Serial.println("I've noticed an item");
+    return true;
+  }
+  Serial.println("I couldnt see nothing");
+  return false;
 }
 
 
