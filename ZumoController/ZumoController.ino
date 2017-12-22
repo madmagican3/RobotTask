@@ -1,3 +1,4 @@
+/*! \file */ 
 #include <ZumoMotors.h>
 #include <ZumoReflectanceSensorArray.h>
 #include <Pushbutton.h>
@@ -11,21 +12,48 @@ Pushbutton button(ZUMO_BUTTON);
 ZumoMotors motors;
 ZumoReflectanceSensorArray reflectanceSensors;
 
-int sensorArr[6];//This defines the sensor array
-int speed = 100;//This is the speed the robot should run at 
-int threshold = 300;//this is the colour threshold for the sensors
-boolean overrideAutoRun = false; // This should be false until you want to override it to control the system manually
-boolean runningMaze = true;//this should be true until the program needs to auto solve the map
-boolean pause = false; //this is used to turn the corners
-boolean returning = false; //This is used to indicate if the system should return
-char path[100];//This array is used as a list in order to work out the turns the arduino is taking
-int pathLength =0;//This is used to keep track of the actual length of the array above
-int roomList[100];//This is used to keep track of the rooms, a is left with item, d is right with item, c is left with no item, v is right with no item
-int roomNo = 0;//This is used to keep track of the actual length of the array above
-char returnList[200];//This is going to be storing dupes and extra info above to construct an idea of the actual corridor in order to allow for optomization. chars used are
-//r = right, l = left, w = wall, b = 180 degree turn (end of corridor), z = end of corridor, k = room on left, l= room on right
-int returnLoc = 0;//This indicates what indicies of the returnList array we're on
-bool isRoomPopped = false; // this is used to pass stuff from the override controller to the room checker
+//!This defines the sensor array
+int sensorArr[6];
+
+//!This is the speed the robot should run at 
+int speed = 100;
+
+//!this is the colour threshold for the sensors
+int threshold = 300;
+
+ //! This should be false until you want to override it to control the system manually
+boolean overrideAutoRun = false;
+
+//!this should be true until the program needs to auto solve the map
+boolean runningMaze = true;
+
+//!this is used to turn the corners
+boolean pause = false; 
+
+//!This is used to indicate if the system should return
+boolean returning = false; 
+
+//!This array is used as a list in order to work out the turns the arduino is taking
+char path[100];
+
+//!This is used to keep track of the actual length of the array above
+int pathLength =0;
+
+//!This is used to keep track of the rooms, a is left with item, d is right with item, c is left with no item, v is right with no item
+int roomList[100];
+
+//!This is used to keep track of the actual length of the array above
+int roomNo = 0;
+
+//!This is going to be storing dupes and extra info above to construct an idea of the actual corridor in order to allow for optomization. chars used are
+//!r = right, l = left, w = wall, b = 180 degree turn (end of corridor), z = end of corridor, k = room on left, l= room on right
+char returnList[200];
+
+//!This indicates what indicies of the returnList array we're on
+int returnLoc = 0;
+
+//! this is used to pass stuff from the override controller to the room checker
+bool isRoomPopped = false; 
 
 void setup()
 {
@@ -60,7 +88,7 @@ void loop()
     delay(150);
 }
 
-//This controls the override of the system
+//!!This controls the override of the system
 void ControllerOverride(){
   bool FinishedOverride = false;
   bool doneVBefore = false;
@@ -118,24 +146,24 @@ void optomizeRoute(){
   int[10] poppedRoomsList;
   int poppedRoomsLoc;
   for(int i = 0; i <= returnLoc ; i++){
-    if (returnList[i] == 'z'){//everytime we start a new sub corridor we want to set side corridor to true
+    if (returnList[i] == 'z'){//!everytime we start a new sub corridor we want to set side corridor to true
       inSubCorridor = !inSubCorridor;
     }
-    if (inSubCorridor){//while we still are in the sub corridor add it to the sub corridor list
+    if (inSubCorridor){//!while we still are in the sub corridor add it to the sub corridor list
       subCorridor[subCorridorLoc] = returnList[i];
       subCorridorLoc += 1;
     }
-    if (!inSubCorridor && subCorridorLoc > 0){//once we're out of the sub corridor
+    if (!inSubCorridor && subCorridorLoc > 0){//!once we're out of the sub corridor
       bool rooms = false;
-      for(int f = 0; f <= subCorridorLoc; f++){//check to see if we have any rooms which had items in them
+      for(int f = 0; f <= subCorridorLoc; f++){//!check to see if we have any rooms which had items in them
         if (subCorridor[f] == 1){
           rooms = true;
           poppedRoomsList[poppedRoomsLoc] = f;
           poppedRoomsLoc += 1;
         }
       }
-      //r = right, l = left, w = wall, b = 180 degree turn (end of corridor), z = end of corridor, k = room on left, l= room on right
-      if (rooms){// if we do have rooms with items in them
+      //!r = right, l = left, w = wall, b = 180 degree turn (end of corridor), z = end of corridor, k = room on left, l= room on right
+      if (rooms){//! if we do have rooms with items in them
         char[50] tempRoute = SubCorridor;
         for (int f = 0;f <=subCorridorLoc; f++){
           if (subCorridor){
@@ -149,7 +177,7 @@ void optomizeRoute(){
   }*/
 }
 
-//This should be the code to handle which direction we're going too after a pause
+//!This should be the code to handle which direction we're going too after a pause
 void runPause ( char val){
   stop();
      if (val == 'd'){//corridor right
@@ -169,11 +197,12 @@ void runPause ( char val){
       roomList[roomNo] = checkRoom('d');
       roomNo += 1;
      }else if (val == 'r'){
+      Serial.println("|This functionality is not implemented, please return via override to the start of the corridor");
       returnToCorridor();
            checkChar('o');
      }
 }
-//This should check the room
+//!This should check the room
 char checkRoom(char leftRight){
   Serial.println("Now searching room No |");
   Serial.println(roomNo+1);
@@ -201,7 +230,7 @@ char checkRoom(char leftRight){
   checkChar('n');
 }
 
-//This runs until the serial array is connected to via the c# program 
+//!This runs until the serial array is connected to via the c# program 
 void connectToProgram(){
   while (true){
       char val = Serial.read();
@@ -213,7 +242,7 @@ void connectToProgram(){
   }
 }
 
-//This should check the char input and then modify the booleans to control the flow if appropriate
+//!This should check the char input and then modify the booleans to control the flow if appropriate
 void checkChar(char val){
    if (val == 'p'){// if the value is p we want to start the pause
       stop();
@@ -240,7 +269,7 @@ void checkChar(char val){
    }
 }
 
-//This will calibrate the sensors by asking the user to place it facing the black line then putting it in the normal spot
+//!This will calibrate the sensors by asking the user to place it facing the black line then putting it in the normal spot
 void calibrate(){
   //inform the user that we want to start calibrating then wait for button
   delay(100);
@@ -274,7 +303,7 @@ void calibrate(){
     //Stop and wait to be put into the ready position
 }
 
-//This should be the default run if we're using the system 
+//!This should be the default run if we're using the system 
 void runMaze(){
     for (byte i = 0; i < 6; i++)
       {
@@ -284,7 +313,7 @@ void runMaze(){
         {
           stop();
           Serial.println("w|");//as specified in the spec, we tell them the corridor no, which is pathlength +1 (as for human readability they wont care about the 0th indice)
-          //for human counting
+          //!for human counting
           Serial.println(pathLength+1);
           checkChar('p');//This will pause the run
           delay(200);
@@ -297,29 +326,32 @@ void runMaze(){
       }
      w();
 }
-void adjustLeft(){//This should adjust the zumo left to stay within the walls
+//!This should adjust the zumo left to stay within the walls
+void adjustLeft(){
   motors.setLeftSpeed(speed*2);
 }
-void adjustRight(){//This should adjust the zumo right to stay within the walls
+//!This should adjust the zumo right to stay within the walls
+void adjustRight(){
   motors.setRightSpeed(speed*2);
 }
-
-void w (){//foward
+//!Moves the robot foward
+void w (){
   motors.setLeftSpeed (speed);
   motors.setRightSpeed(speed);
 }
-
-void a(){//left
+//!Moves the robot left
+void a(){
   motors.setLeftSpeed((speed*2)*-1);
   motors.setRightSpeed(speed*2);
 }
 
-void d(){//right
+//!moves the robot right
+void d(){
   motors.setLeftSpeed(speed*2);
   motors.setRightSpeed((speed*2)*-1);
 }
-  
-void s(){//backwards
+//!Moves the robot backwards  
+void s(){
   motors.setLeftSpeed(-speed);
   motors.setRightSpeed(-speed);
 }
@@ -329,25 +361,27 @@ void stop(){
   motors.setRightSpeed(0);
 }
 
-void turnRight(){//This should be a 90 degree turn (or as close as possible) for simplicities sake towards the right
+//!This should be a 90 degree turn (or as close as possible) for simplicities sake towards the right
+void turnRight(){
   motors.setLeftSpeed(-200);
   motors.setRightSpeed(200);
   delay(400);
   stop();
 }
-void turnLeft(){//This should be a 90 degree turn (or as close as possible) for simplicities sake towards the left
+//!This should be a 90 degree turn (or as close as possible) for simplicities sake towards the left
+void turnLeft(){
   motors.setLeftSpeed(200);
   motors.setRightSpeed(-200);
   delay(400);
   stop();
 }
-
-bool checkItem(){// returns true if there's an item within 10cm's
+//! returns true if there's an item within 10cm's
+bool checkItem(){
   w();
   delay (200);
   stop();
   delay (1000);
-  //So as a note, i think this connection can be a little suspect, it'll sometimes just return a 0 for distance and duration when testing for extended periods of time
+  //!So as a note, i think this connection can be a little suspect, it'll sometimes just return a 0 for distance and duration when testing for extended periods of time
   //then when i fiddle around with the wiring a little it'll return actual values for a bit and then back to returning nothing
   //I'm not certain what's causing this so i'm going to add a delay above and also repeat this up to 10 times if the duration == 0
   //This will not produce false positives as if it's really 0, it'll stay 0
