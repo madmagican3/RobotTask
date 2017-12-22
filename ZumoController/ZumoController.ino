@@ -82,13 +82,10 @@ void ControllerOverride(){
        checkChar('n');
       break;
       case 'v'://This is the room case
-      Serial.println("v case");
       if (!doneVBefore){
-        Serial.println("Attempting to check room");
         isRoomPopped = checkItem();
         doneVBefore = true;
       }else {
-        Serial.println("else case");
         FinishedOverride = true;
         break;
       }
@@ -184,10 +181,8 @@ char checkRoom(char leftRight){
       Serial.println("| on the right|");
   }else {
     Serial.println("| on the left|");
-  }
-  Serial.println("Please point me in the correct direction");
+  } 
   ControllerOverride();
-  Serial.println("finished the controller override");
   if (isRoomPopped){
     Serial.println("There is a person in there, that's bad!");
     if (leftRight == 'a'){
@@ -203,6 +198,7 @@ char checkRoom(char leftRight){
     return 'v';//right no item
    }
   }
+  checkChar('n');
 }
 
 //This runs until the serial array is connected to via the c# program 
@@ -350,19 +346,30 @@ bool checkItem(){// returns true if there's an item within 10cm's
   w();
   delay (200);
   stop();
+  delay (1000);
+  //So as a note, i think this connection can be a little suspect, it'll sometimes just return a 0 for distance and duration when testing for extended periods of time
+  //then when i fiddle around with the wiring a little it'll return actual values for a bit and then back to returning nothing
+  //I'm not certain what's causing this so i'm going to add a delay above and also repeat this up to 10 times if the duration == 0
+  //This will not produce false positives as if it's really 0, it'll stay 0
   long duration, distance;
   digitalWrite(trigPin, LOW);  
-  delayMicroseconds(2);
+  delayMicroseconds(4);
   digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10); 
+  delayMicroseconds(20); 
   digitalWrite(trigPin, LOW);
-  duration = pulseIn(echoPin, HIGH);
+  for (int i = 0; i <= 10;i++){
+    if (duration > 0){
+      break;
+    }
+    duration = pulseIn(echoPin, HIGH);
+  }
   distance = (duration/2) / 29.1;
   Serial.println("Please turn me back in the correct direction");
-  if (distance<10){
+  if (distance<10&& distance != 0){//if distance is within 10 cms and is not 0, as duration not picking up anything for a decent period will be 0 due to timeout
     Serial.println("I've noticed an item");
     return true;
   }
+  Serial.println("I couldnt see nothing");
   return false;
 }
 
