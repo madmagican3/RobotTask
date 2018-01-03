@@ -4,8 +4,8 @@
 #include <Pushbutton.h>
 #include <QTRSensors.h>
 
-#define trigPin 4
-#define echoPin 3
+#define trigPin 2
+#define echoPin 4
 #define ledPin 13
 
 Pushbutton button(ZUMO_BUTTON);
@@ -59,8 +59,6 @@ void setup()
 {
   Serial.begin(9600);
   connectToProgram();
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
   //define the pins and then calibrate the program
   calibrate();
 }
@@ -113,6 +111,7 @@ void ControllerOverride(){
       if (!doneVBefore){
         isRoomPopped = checkItem();
         doneVBefore = true;
+        Serial.println("Please move the zumo back into the corridor, it has checked the room");
       }else {
         FinishedOverride = true;
         break;
@@ -193,34 +192,37 @@ void runPause ( char val){
      }else if (val =='b'){//roomLeft
       roomList[roomNo] = checkRoom('a');
       roomNo += 1;
+      checkChar('n');
      }else if (val == 'm'){//roomRight
       roomList[roomNo] = checkRoom('d');
       roomNo += 1;
+            checkChar('n');
      }else if (val == 'r'){
       Serial.println("|This functionality is not implemented, please return via override to the start of the corridor");
       returnToCorridor();
-           checkChar('o');
+           ControllerOverride();
+                 checkChar('n');
      }
 }
 //!This should check the room
 char checkRoom(char leftRight){
-  Serial.println("Now searching room No |");
+  Serial.println("|Going to search  room No |");
   Serial.println(roomNo+1);
   if (leftRight == 'm'){
-      Serial.println("| on the right|");
+      Serial.println("| on the right after being moved into position|");
   }else {
-    Serial.println("| on the left|");
+    Serial.println("| on the left after being moved into position|");
   } 
   ControllerOverride();
   if (isRoomPopped){
-    Serial.println("There is a person in there, that's bad!");
+    Serial.println("The room is populated, that's bad!");
     if (leftRight == 'a'){
       return 'a';//left with item
     }else {
       return 'd';//right with item
     }
   }else {
-   Serial.println("Nothing here boss"); 
+   Serial.println("The room is not populated"); 
    if (leftRight == 'a'){
     return 'c';//left no item
    }else {
@@ -228,6 +230,7 @@ char checkRoom(char leftRight){
    }
   }
   checkChar('n');
+  return;
 }
 
 //!This runs until the serial array is connected to via the c# program 
@@ -287,7 +290,7 @@ void calibrate(){
         motors.setLeftSpeed(50);
         motors.setRightSpeed(50);
       }   
-      unsigned long currentMillis = millis() + 2000;
+      unsigned long currentMillis = millis() + 1200;
       while (millis() < currentMillis ){
         
               reflectanceSensors.calibrate();
@@ -309,7 +312,7 @@ void runMaze(){
       {
         reflectanceSensors.readCalibrated(sensorArr);
       }
-      if ( sensorArr[0] > threshold && sensorArr[5] > threshold)//if we've encountered a wall
+      if ( sensorArr[2] > threshold && sensorArr[3] > threshold)//if we've encountered a wall
         {
           stop();
           Serial.println("w|");//as specified in the spec, we tell them the corridor no, which is pathlength +1 (as for human readability they wont care about the 0th indice)
@@ -341,14 +344,14 @@ void w (){
 }
 //!Moves the robot left
 void a(){
-  motors.setLeftSpeed((speed*2)*-1);
-  motors.setRightSpeed(speed*2);
+  motors.setLeftSpeed((speed)*-1);
+  motors.setRightSpeed(speed);
 }
 
 //!moves the robot right
 void d(){
-  motors.setLeftSpeed(speed*2);
-  motors.setRightSpeed((speed*2)*-1);
+  motors.setLeftSpeed(speed);
+  motors.setRightSpeed((speed)*-1);
 }
 //!Moves the robot backwards  
 void s(){
@@ -377,33 +380,27 @@ void turnLeft(){
 }
 //! returns true if there's an item within 10cm's
 bool checkItem(){
+  //Serial.println("Checking the room");
   w();
   delay (200);
   stop();
-  delay (1000);
-  //!So as a note, i think this connection can be a little suspect, it'll sometimes just return a 0 for distance and duration when testing for extended periods of time
-  //then when i fiddle around with the wiring a little it'll return actual values for a bit and then back to returning nothing
-  //I'm not certain what's causing this so i'm going to add a delay above and also repeat this up to 10 times if the duration == 0
-  //This will not produce false positives as if it's really 0, it'll stay 0
   long duration, distance;
-  digitalWrite(trigPin, LOW);  
-  delayMicroseconds(4);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(20); 
-  digitalWrite(trigPin, LOW);
-  for (int i = 0; i <= 10;i++){
-    if (duration > 0){
-      break;
-    }
+    pinMode(trigPin, OUTPUT);
+    digitalWrite(trigPin, LOW);  
+    delayMicroseconds(4);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(20); 
+    digitalWrite(trigPin, LOW);
+      pinMode(echoPin, INPUT);
     duration = pulseIn(echoPin, HIGH);
-  }
+//    Serial.print("Duration : " );
+//    Serial.println(duration);
+//    Serial.print("Distance : ");
   distance = (duration/2) / 29.1;
-  Serial.println("Please turn me back in the correct direction");
+//  Serial.println(distance);
   if (distance<10&& distance != 0){//if distance is within 10 cms and is not 0, as duration not picking up anything for a decent period will be 0 due to timeout
-    Serial.println("I've noticed an item");
     return true;
   }
-  Serial.println("I couldnt see nothing");
   return false;
 }
 
