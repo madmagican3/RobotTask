@@ -26,7 +26,7 @@ namespace ArduinoSetup
         /// <summary>
         /// This is a cheap and easy way to work out if we've got to hide the override UI
         /// </summary>
-        private int numberofTimesVCalled = 0;
+        private int numberofTimesVCalled;
         /// <summary>
         /// This is used to keep track on if we hit a wall as we want different options available if we hit a wall
         /// </summary>
@@ -143,6 +143,7 @@ namespace ArduinoSetup
                         return;
                     }
                     this.SerialReturnsList.Items.Add(text);
+                    this.SerialReturnsList.TopIndex = SerialReturnsList.Items.Count - 1;
                 }
             }
         }
@@ -271,7 +272,6 @@ namespace ArduinoSetup
         /// <param name="e"></param>
         private void Resume_Click(object sender, EventArgs e)
         {
-            _localSerialInstance.SendChar('n');
             ChooseDirection(false);
             OverrideController(false);
         }
@@ -306,6 +306,7 @@ namespace ArduinoSetup
                 if (numberofTimesVCalled % 2 != 0)
                 {
                     OverrideController(true);
+                    numberofTimesVCalled = 0;
                     return;
                 }
                 numberofTimesVCalled += 1;
@@ -367,7 +368,8 @@ namespace ArduinoSetup
         private void BackBtn_Click(object sender, EventArgs e)
         {
             _localSerialInstance.SendChar('r');
-
+            OverrideController(false);
+            ChooseDirection(false);
         }
         /// <summary>
         /// This should send the foward character to mark a room or corridor as being in front

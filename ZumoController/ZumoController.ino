@@ -290,7 +290,7 @@ void calibrate(){
         motors.setLeftSpeed(50);
         motors.setRightSpeed(50);
       }   
-      unsigned long currentMillis = millis() + 2000;
+      unsigned long currentMillis = millis() + 1200;
       while (millis() < currentMillis ){
         
               reflectanceSensors.calibrate();
@@ -312,7 +312,7 @@ void runMaze(){
       {
         reflectanceSensors.readCalibrated(sensorArr);
       }
-      if ( sensorArr[0] > threshold && sensorArr[5] > threshold)//if we've encountered a wall
+      if ( sensorArr[2] > threshold && sensorArr[3] > threshold)//if we've encountered a wall
         {
           stop();
           Serial.println("w|");//as specified in the spec, we tell them the corridor no, which is pathlength +1 (as for human readability they wont care about the 0th indice)
@@ -344,14 +344,14 @@ void w (){
 }
 //!Moves the robot left
 void a(){
-  motors.setLeftSpeed((speed*2)*-1);
-  motors.setRightSpeed(speed*2);
+  motors.setLeftSpeed((speed)*-1);
+  motors.setRightSpeed(speed);
 }
 
 //!moves the robot right
 void d(){
-  motors.setLeftSpeed(speed*2);
-  motors.setRightSpeed((speed*2)*-1);
+  motors.setLeftSpeed(speed);
+  motors.setRightSpeed((speed)*-1);
 }
 //!Moves the robot backwards  
 void s(){
@@ -380,7 +380,7 @@ void turnLeft(){
 }
 //! returns true if there's an item within 10cm's
 bool checkItem(){
-  Serial.println("Checking the room");
+  //Serial.println("Checking the room");
   w();
   delay (200);
   stop();
@@ -393,7 +393,11 @@ bool checkItem(){
     digitalWrite(trigPin, LOW);
       pinMode(echoPin, INPUT);
     duration = pulseIn(echoPin, HIGH);
+//    Serial.print("Duration : " );
+//    Serial.println(duration);
+//    Serial.print("Distance : ");
   distance = (duration/2) / 29.1;
+//  Serial.println(distance);
   if (distance<10&& distance != 0){//if distance is within 10 cms and is not 0, as duration not picking up anything for a decent period will be 0 due to timeout
     return true;
   }
